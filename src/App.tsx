@@ -55,9 +55,9 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 selection:bg-violet-500/30 overflow-x-hidden">
       {/* 氛围渐变光晕 */}
-      <div className="pointer-events-none absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-violet-600/8 blur-[120px]" />
-      <div className="pointer-events-none absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-fuchsia-600/4 blur-[130px]" />
-      <div className="pointer-events-none absolute bottom-10 -left-20 h-[500px] w-[500px] rounded-full bg-emerald-600/4 blur-[120px]" />
+      <div className="pointer-events-none absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-violet-600/12 blur-[130px] animate-float-1" />
+      <div className="pointer-events-none absolute top-1/4 -right-40 h-[700px] w-[700px] rounded-full bg-fuchsia-600/8 blur-[145px] animate-float-2" />
+      <div className="pointer-events-none absolute bottom-20 -left-20 h-[600px] w-[600px] rounded-full bg-emerald-600/7 blur-[130px] animate-float-3" />
 
       <Header date={today} progress={done.length} total={total} streak={streak} />
       <main className="relative z-10 mx-auto max-w-5xl px-5 py-8 sm:px-8">

@@ -40,9 +40,9 @@ const ProgressRing = ({ value, total }: { value: number; total: number }) => {
 export default function Header({ date, progress, total, streak }: Props) {
   const allDone = progress >= total && total > 0
   return (
-    <header className="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-md">
+    <header className="relative border-b border-zinc-900/60 bg-zinc-950/45 backdrop-blur-lg">
       <div className="mx-auto flex max-w-5xl items-center gap-4 px-5 py-5 sm:px-8">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-2xl shadow-lg shadow-violet-900/40">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-2xl shadow-lg shadow-violet-500/20 animate-pulse [animation-duration:6s]">
           👁️
         </div>
         <div className="flex-1">
@@ -60,17 +60,21 @@ export default function Header({ date, progress, total, streak }: Props) {
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden text-right sm:block">
-            <div className="text-[11px] uppercase tracking-wide text-zinc-500">连续</div>
-            <div className="text-lg font-bold text-amber-400">{streak} 天 🔥</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">连续追踪</div>
+            <div className="text-lg font-black bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent flex items-center justify-end gap-0.5">
+              {streak} 天 <span className="text-base select-none animate-bounce origin-bottom inline-block [animation-duration:1.5s]">🔥</span>
+            </div>
           </div>
           <ProgressRing value={progress} total={total} />
         </div>
       </div>
       {allDone && (
-        <div className="border-t border-emerald-900/40 bg-emerald-950/30 py-1.5 text-center text-xs font-medium text-emerald-300">
-          ✓ 今日清单已全部完成，没有掉队！
+        <div className="border-t border-emerald-950 bg-emerald-950/25 py-2 text-center text-xs font-semibold text-emerald-400 tracking-wide">
+          ✓ 今日清单已全部完成，完美守护！
         </div>
       )}
+      {/* 底部渐变细饰条 */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-violet-500/25 to-transparent" />
     </header>
   )
 }

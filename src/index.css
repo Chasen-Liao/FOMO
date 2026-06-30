@@ -60,3 +60,37 @@ body {
 .animate-bounce-scale {
   animation: bounce-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+
+@keyframes float-slow-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(50px, 40px) scale(1.12);
+  }
+}
+@keyframes float-slow-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate(-60px, -30px) scale(0.92);
+  }
+}
+@keyframes float-slow-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-30px, 50px) scale(1.06);
+  }
+}
+.animate-float-1 {
+  animation: float-slow-1 22s infinite ease-in-out;
+}
+.animate-float-2 {
+  animation: float-slow-2 26s infinite ease-in-out;
+}
+.animate-float-3 {
+  animation: float-slow-3 24s infinite ease-in-out;
+}

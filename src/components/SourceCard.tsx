@@ -18,8 +18,8 @@ export default function SourceCard({ source, items, loading, done, onToggle }: P
     <div
       className={`fomo-fade group relative flex flex-col rounded-2xl border p-4 transition-all duration-300 backdrop-blur-md ${
         done
-          ? 'border-emerald-500/25 bg-emerald-950/15 shadow-md shadow-emerald-950/10'
-          : 'border-zinc-800/60 bg-zinc-900/25 hover:-translate-y-1 hover:border-violet-500/30 hover:bg-zinc-900/40 hover:shadow-lg hover:shadow-violet-950/15'
+          ? 'border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 to-zinc-950/40 shadow-lg shadow-emerald-950/15'
+          : 'border-zinc-800/60 bg-gradient-to-br from-zinc-900/20 to-zinc-950/30 hover:-translate-y-1.5 hover:border-violet-500/40 hover:bg-zinc-900/40 hover:shadow-xl hover:shadow-violet-950/20'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
