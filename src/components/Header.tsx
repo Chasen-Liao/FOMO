@@ -61,8 +61,11 @@ export default function Header({ date, progress, total, streak }: Props) {
         <div className="flex items-center gap-4">
           <div className="hidden text-right sm:block">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">连续追踪</div>
-            <div className="text-lg font-black bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent flex items-center justify-end gap-0.5">
-              {streak} 天 <span className="text-base select-none animate-bounce origin-bottom inline-block [animation-duration:1.5s]">🔥</span>
+            <div className="flex items-center justify-end gap-1 select-none">
+              <span className="text-lg font-black bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
+                {streak} 天
+              </span>
+              <span className="text-base animate-bounce origin-bottom inline-block [animation-duration:1.5s]">🔥</span>
             </div>
           </div>
           <ProgressRing value={progress} total={total} />
