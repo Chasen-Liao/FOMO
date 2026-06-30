@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CATEGORIES, SOURCES } from './sources'
 import { fetchFeed } from './feeds'
-import { computeStreak, getDone, saveDone } from './storage'
+import { computeStreak, getDone, saveDone, getFeedsCache, saveFeedsCache } from './storage'
 import type { FeedItem } from './types'
 import Header from './components/Header'
 import CategorySection from './components/CategorySection'
@@ -12,6 +12,8 @@ export default function App() {
   const [feedsLoaded, setFeedsLoaded] = useState(false)
   const [streak, setStreak] = useState(0)
   const [showHint, setShowHint] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<string>('')
 
   useEffect(() => {
     setStreak(computeStreak())
@@ -22,21 +24,66 @@ export default function App() {
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 
-  useEffect(() => {
-    let active = true
-    const feedSources = SOURCES.filter((s) => s.feed)
-    Promise.all(
-      feedSources.map(async (s) => [s.id, await fetchFeed(s)] as const),
-    )
-      .then((entries) => {
-        if (!active) return
-        setFeeds(Object.fromEntries(entries))
-        setFeedsLoaded(true)
-      })
-      .catch(() => setFeedsLoaded(true))
-    return () => {
-      active = false
+  const loadFeeds = async (force = false) => {
+    setRefreshing(true)
+    const cache = getFeedsCache()
+    const now = Date.now()
+
+    if (!force && cache && now - cache.updatedAt < 30 * 60 * 1000) {
+      setFeeds(cache.feeds)
+      setLastUpdated(
+        new Date(cache.updatedAt).toLocaleTimeString('zh-CN', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      )
+      setFeedsLoaded(true)
+      setRefreshing(false)
+      return
     }
+
+    const feedSources = SOURCES.filter((s) => s.feed)
+    try {
+      const entries = await Promise.all(
+        feedSources.map(async (s) => [s.id, await fetchFeed(s)] as const)
+      )
+      const nextFeeds = Object.fromEntries(entries)
+
+      if (cache) {
+        for (const [id, items] of Object.entries(nextFeeds)) {
+          if (items.length === 0 && cache.feeds[id] && cache.feeds[id].length > 0) {
+            nextFeeds[id] = cache.feeds[id]
+          }
+        }
+      }
+
+      setFeeds(nextFeeds)
+      saveFeedsCache(nextFeeds, now)
+      setLastUpdated(
+        new Date(now).toLocaleTimeString('zh-CN', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      )
+      setFeedsLoaded(true)
+    } catch {
+      if (cache) {
+        setFeeds(cache.feeds)
+        setLastUpdated(
+          new Date(cache.updatedAt).toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        )
+      }
+      setFeedsLoaded(true)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  useEffect(() => {
+    loadFeeds(false)
   }, [])
 
   const toggle = (id: string) => {
@@ -67,7 +114,18 @@ export default function App() {
         <Header date={today} progress={done.length} total={total} streak={streak} />
 
         <p className="form-note">
-          ※ 依次过一遍，每看一个就在前面方框里打勾。低功耗过一遍眼睛，重要的事大概率就不会错过了。
+          <span>※ 依次过一遍，每看一个就在前面方框里打勾。低功耗过一遍眼睛，重要的事大概率就不会错过了。</span>
+          <span className="feed-cache-info">
+            {lastUpdated ? `（已缓存，上次更新：${lastUpdated}）` : refreshing ? '（正在加载最新信息...）' : ''}
+            <button
+              className="btn-refresh"
+              onClick={() => loadFeeds(true)}
+              disabled={refreshing}
+              title="重新获取最新数据并刷新缓存"
+            >
+              {refreshing ? '正在刷新...' : '↻ 强制刷新'}
+            </button>
+          </span>
         </p>
 
         <div id="sections">

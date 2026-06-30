@@ -1,3 +1,5 @@
+import type { FeedItem } from './types'
+
 const dateKey = (d = new Date()): string => {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -44,4 +46,34 @@ export const computeStreak = (): number => {
     d.setDate(d.getDate() - 1)
   }
   return streak
+}
+
+interface FeedsCache {
+  updatedAt: number
+  feeds: Record<string, FeedItem[]>
+}
+
+const FEEDS_CACHE_KEY = 'fomo:feeds_cache'
+
+export const getFeedsCache = (): FeedsCache | null => {
+  try {
+    const raw = localStorage.getItem(FEEDS_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed.updatedAt === 'number' && parsed.feeds) {
+      return parsed
+    }
+  } catch {
+    /* 存储不可用时静默失败 */
+  }
+  return null
+}
+
+export const saveFeedsCache = (feeds: Record<string, FeedItem[]>, updatedAt = Date.now()): void => {
+  try {
+    const data: FeedsCache = { updatedAt, feeds }
+    localStorage.setItem(FEEDS_CACHE_KEY, JSON.stringify(data))
+  } catch {
+    /* 存储不可用时静默失败 */
+  }
 }

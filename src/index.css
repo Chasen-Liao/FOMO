@@ -527,3 +527,39 @@ a:focus-visible{
   .completion-stamp{ right:24px; bottom:60px; }
   .completion-stamp .seal{ width:108px; height:108px; }
 }
+
+/* ========== 缓存刷新信息与按钮 ========== */
+.feed-cache-info {
+  display: inline-block;
+  margin-left: 12px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+.btn-refresh {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+.btn-refresh:hover {
+  color: var(--stamp-red);
+}
+.btn-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 640px) {
+  .feed-cache-info {
+    display: block;
+    margin-left: 0;
+    margin-top: 6px;
+  }
+}
+
