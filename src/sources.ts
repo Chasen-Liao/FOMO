@@ -4,10 +4,10 @@ export const SOURCES: Source[] = [
   // 新闻
   {
     id: 'twitter',
-    name: 'Twitter / X',
+    name: 'Twitter / X (AI 领袖动态)',
     category: 'news',
-    url: 'https://x.com/',
-    desc: 'AI 最新消息的发源地，关注官方账号与 KOL List',
+    url: 'https://x.com/search?q=(AI%20OR%20LLM)%20(from%3A_akhaliq%20OR%20from%3Akarpathy%20OR%20from%3Aylecun%20OR%20from%3ADrJimFan%20OR%20from%3Aswyx)&f=live',
+    desc: '聚合 AK、Karpathy、LeCun、Jim Fan 等顶级 AI 领袖的实时推文，自动过滤杂音',
   },
   {
     id: 'aihot',
@@ -41,6 +41,20 @@ export const SOURCES: Source[] = [
     url: 'https://openrouter.ai/models',
     desc: '新模型收录入口，价格 / 速度 / 跑分一览',
     feed: { kind: 'openrouter' },
+  },
+  {
+    id: 'huggingface',
+    name: 'Hugging Face Trending',
+    category: 'model',
+    url: 'https://huggingface.co/trending',
+    desc: 'HF 社区每日最热门大模型、数据集和 Spaces 应用榜单',
+  },
+  {
+    id: 'github_trending',
+    name: 'GitHub Python Trending',
+    category: 'model',
+    url: 'https://github.com/trending/python?since=daily',
+    desc: 'GitHub 每日热门 Python 项目榜单，AI 开源项目首发地',
   },
   {
     id: 'llmstats',
