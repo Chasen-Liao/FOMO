@@ -79,7 +79,18 @@ export default function SourceCard({ source, items, loading, done, onToggle }: P
           </ul>
         )}
       </div>
-      {showGoArrow && <span className="go-arrow">前往 ↗</span>}
+      {showGoArrow && (
+        <a 
+          href={source.url} 
+          target="_blank" 
+          rel="noreferrer noopener" 
+          className="go-arrow" 
+          onClick={(e) => e.stopPropagation()}
+          style={{ textDecoration: 'none' }}
+        >
+          前往 ↗
+        </a>
+      )}
     </div>
   )
 }
