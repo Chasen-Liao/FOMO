@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FOMO · 每日 AI 信息源打卡纸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;700&family=ZCOOL+KuaiLe&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* 纸面色板 */
+    --paper:        #f3e9d2;        /* 米黄牛皮纸 */
+    --paper-light:  #f7efd9;
+    --paper-shade:  #e8dcc0;
+    --ink:          #1f2230;        /* 墨蓝黑 */
+    --ink-soft:     #3d3a32;        /* 棕墨 */
+    --ink-muted:    #6b5d48;        /* 淡墨 */
+    --rule:         #b8a888;        /* 横格线 棕灰 */
+    --rule-soft:    rgba(160,140,100,0.35);
+    --margin-red:   #c0392b;        /* 装订红 */
+    --margin-red-s: #9c2a1e;
+    --stamp-red:    #b8362f;        /* 印章红 */
+    --done-green:   #4a6b3a;        /* 墨绿 */
+    --sepia:        #a67c3f;        /* 泛黄高光 */
+    --desk:         #2a2018;        /* 桌面底色 */
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:'Noto Serif SC', 'Songti SC', 'STSong', serif;
+    color:var(--ink);
+    background:
+      radial-gradient(ellipse at 50% 0%, #3a2d20 0%, var(--desk) 60%, #1a1209 100%);
+    min-height:100vh;
+    padding:32px 16px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ========== 纸张容器 ========== */
+  .sheet{
+    max-width:880px;
+    margin:0 auto;
+    background:var(--paper);
+    position:relative;
+    padding:64px 56px 80px 96px;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.08),
+      0 20px 50px rgba(0,0,0,0.45),
+      0 40px 90px rgba(0,0,0,0.25);
+    /* 纸张微微泛黄的不均匀感 */
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(255,250,230,0.5), transparent 60%),
+      radial-gradient(ellipse at 85% 85%, rgba(180,150,100,0.12), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(160,130,80,0.08) 100%);
+    animation:sheetDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  /* 纸张入场：从桌面下方轻落、微旋复位 */
+  @keyframes sheetDrop{
+    0%   { opacity:0; transform:translateY(18px) rotate(-0.4deg); }
+    100% { opacity:1; transform:translateY(0) rotate(0); }
+  }
+  /* 纸面噪点纹理 */
+  .sheet::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0 0.12 0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity:0.45;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    z-index:1;
+  }
+  /* 纸张右下角微微卷曲的暗角 */
+  .sheet::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(135deg, transparent 92%, rgba(120,90,50,0.18) 100%),
+      linear-gradient(to top right, rgba(120,90,50,0.08), transparent 30%);
+    pointer-events:none;
+    z-index:1;
+  }
+  .sheet > *{ position:relative; z-index:2; }
+
+  /* 横格线 —— 贯穿整张纸 */
+  .ruled{
+    position:absolute;
+    left:96px; right:56px;
+    top:220px; bottom:80px;
+    background-image:repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 39px,
+      var(--rule-soft) 39px,
+      var(--rule-soft) 40px
+    );
+    pointer-events:none;
+    z-index:0;
+  }
+  /* 左侧红色装订边线（双线） */
+  .margin-line{
+    position:absolute;
+    left:72px;
+    top:0; bottom:0;
+    width:1px;
+    background:var(--margin-red);
+    opacity:0.55;
+    z-index:1;
+  }
+  .margin-line::after{
+    content:"";
+    position:absolute;
+    left:4px; top:0; bottom:0;
+    width:1px;
+    background:var(--margin-red);
+    opacity:0.7;
+  }
+  /* 装订孔（左侧三孔） */
+  .punch{
+    position:absolute;
+    left:24px;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--desk);
+    box-shadow:
+      inset 0 1px 2px rgba(0,0,0,0.6),
+      0 0 0 2px rgba(120,90,50,0.15);
+    z-index:3;
+  }
+  .punch.p1{ top:140px; }
+  .punch.p2{ top:50%; transform:translateY(-50%); }
+  .punch.p3{ bottom:140px; }
+
+  /* ========== 表头 ========== */
+  .form-head{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:18px;
+    margin-bottom:14px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .form-title{
+    font-family:'DM Serif Display', 'Songti SC', 'STSong', serif;
+    font-size:88px;
+    line-height:1;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+  }
+  .form-title .sub{
+    font-family:'Ma Shan Zheng', 'KaiTi', serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink-muted);
+    letter-spacing:5px;
+    display:block;
+    margin-top:10px;
+  }
+  .form-meta{
+    text-align:right;
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.9;
+  }
+  .form-meta .lbl{
+    color:var(--ink-muted);
+    margin-right:6px;
+  }
+  .form-meta .val{
+    font-family:'Ma Shan Zheng', serif;
+    font-size:18px;
+    color:var(--ink);
+    border-bottom:1px dotted var(--ink-muted);
+    padding:0 8px 2px;
+    min-width:60px;
+    display:inline-block;
+    text-align:center;
+  }
+  .form-meta .streak-val{
+    color:var(--stamp-red);
+  }
+
+  /* 顶部说明条 */
+  .form-note{
+    font-size:12.5px;
+    color:var(--ink-muted);
+    line-height:1.7;
+    padding:8px 0 22px;
+    border-bottom:1px dashed var(--rule);
+    margin-bottom:32px;
+  }
+
+  /* 进度印章 —— 右上角圆形章 */
+  .progress-stamp{
+    position:absolute;
+    top:48px; right:48px;
+    width:96px; height:96px;
+    z-index:4;
+    transform:rotate(-8deg);
+  }
+  .progress-stamp svg{ width:100%; height:100%; }
+  .progress-stamp .ring{
+    fill:none;
+    stroke:var(--stamp-red);
+    stroke-width:2.5;
+  }
+  .progress-stamp .ring-bg{
+    fill:none;
+    stroke:var(--stamp-red);
+    stroke-width:1;
+    opacity:0.25;
+  }
+  .progress-stamp text{
+    font-family:'ZCOOL KuaiLe', serif;
+    fill:var(--stamp-red);
+  }
+  .progress-stamp .num{
+    font-size:30px;
+    font-weight:700;
+    text-anchor:middle;
+  }
+  .progress-stamp .lab{
+    font-size:9px;
+    letter-spacing:2px;
+    text-anchor:middle;
+  }
+
+  /* ========== 章节 ========== */
+  .section{ margin-bottom:38px; }
+  .section-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:0 0 14px;
+    padding-bottom:6px;
+  }
+  .section-num{
+    font-family:'Ma Shan Zheng', serif;
+    font-size:34px;
+    line-height:1;
+    color:var(--stamp-red);
+  }
+  .section-title{
+    font-family:'Ma Shan Zheng', serif;
+    font-size:26px;
+    line-height:1;
+    color:var(--ink);
+    letter-spacing:3px;
+  }
+  .section-meta{
+    font-size:12px;
+    color:var(--ink-muted);
+    margin-left:auto;
+    font-family:'Noto Serif SC', serif;
+  }
+  .section-meta .done-mark{
+    color:var(--done-green);
+    font-weight:700;
+  }
+  .section-rule{
+    flex:1;
+    height:0;
+    border-bottom:1px solid var(--ink);
+    opacity:0.6;
+  }
+
+  /* ========== 打卡行 ========== */
+  .rows{ display:flex; flex-direction:column; }
+  .row{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    padding:10px 4px 10px 0;
+    min-height:40px;
+    border-bottom:1px dashed transparent;
+    cursor:pointer;
+    transition:background 0.2s;
+    position:relative;
+  }
+  .row:hover{
+    background:rgba(180,140,80,0.07);
+  }
+  .row + .row{
+    border-top:1px dashed var(--rule-soft);
+  }
+
+  /* 手绘方框勾选 */
+  .check{
+    flex-shrink:0;
+    width:24px; height:24px;
+    margin-top:2px;
+    position:relative;
+  }
+  .check svg{ width:100%; height:100%; display:block; }
+  .check .box{
+    fill:none;
+    stroke:var(--ink-soft);
+    stroke-width:1.6;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .check .tick{
+    fill:none;
+    stroke:var(--done-green);
+    stroke-width:2.6;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    stroke-dasharray:60;
+    stroke-dashoffset:60;
+    transition:stroke-dashoffset 0.35s ease;
+  }
+  .row.done .check .tick{
+    stroke-dashoffset:0;
+  }
+  /* 已完成时方框颜色变绿 */
+  .row.done .check .box{
+    stroke:var(--done-green);
+  }
+  /* 勾选瞬间墨压回弹 —— 像按图章的触觉反馈 */
+  .row.done .check{
+    animation:inkPress 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin:center;
+  }
+  @keyframes inkPress{
+    0%   { transform:scale(1); }
+    45%  { transform:scale(1.18); }
+    100% { transform:scale(1); }
+  }
+
+  .row-body{ flex:1; min-width:0; padding-top:1px; }
+  .row-name{
+    font-family:'Noto Serif SC', serif;
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--ink);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    line-height:1.4;
+  }
+  .row-name:hover{ color:var(--stamp-red); }
+  .row-name .ext{
+    width:11px; height:11px;
+    opacity:0.5;
+  }
+  .row.done .row-name{
+    color:var(--ink-muted);
+    text-decoration:line-through;
+    text-decoration-color:var(--done-green);
+    text-decoration-thickness:1.5px;
+  }
+  .row-desc{
+    font-size:12.5px;
+    color:var(--ink-muted);
+    line-height:1.6;
+    margin-top:2px;
+  }
+  .row-preview{
+    margin-top:6px;
+    padding-left:10px;
+    border-left:2px solid var(--rule);
+  }
+  .row-preview li{
+    list-style:none;
+    font-size:12px;
+    color:var(--ink-muted);
+    line-height:1.7;
+    text-decoration:none;
+    display:block;
+  }
+  .row-preview li:hover{ color:var(--stamp-red); }
+  .row-preview li .t{ display:inline; }
+  .row-preview li .d{
+    color:var(--sepia);
+    font-size:10.5px;
+    margin-left:6px;
+    font-family:'Caveat', cursive;
+  }
+
+  /* 行尾「前往」墨水箭头 */
+  .go-arrow{
+    font-family:'Caveat', cursive;
+    font-size:18px;
+    color:var(--ink-soft);
+    margin-top:2px;
+    align-self:center;
+    opacity:0.7;
+  }
+
+  /* ========== 底部完成印章 ========== */
+  .completion-stamp{
+    display:none;
+    position:absolute;
+    right:64px;
+    bottom:96px;
+    z-index:5;
+    transform:rotate(-12deg);
+    pointer-events:none;
+  }
+  .all-done .completion-stamp{
+    display:block;
+    animation:stampIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes stampIn{
+    0%{ opacity:0; transform:rotate(-30deg) scale(1.6); }
+    60%{ opacity:1; transform:rotate(-8deg) scale(0.92); }
+    100%{ opacity:0.92; transform:rotate(-12deg) scale(1); }
+  }
+  .completion-stamp .seal{
+    width:140px; height:140px;
+    border:3px double var(--stamp-red);
+    border-radius:50%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:var(--stamp-red);
+    font-family:'ZCOOL KuaiLe', serif;
+    background:rgba(243,233,210,0.3);
+  }
+  .completion-stamp .seal .big{
+    font-size:32px;
+    letter-spacing:4px;
+    line-height:1;
+  }
+  .completion-stamp .seal .small{
+    font-size:11px;
+    letter-spacing:3px;
+    margin-top:6px;
+    font-family:'Noto Serif SC', serif;
+  }
+
+  /* ========== 页脚 ========== */
+  .form-foot{
+    margin-top:48px;
+    padding-top:18px;
+    border-top:1px solid var(--ink);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:11.5px;
+    color:var(--ink-muted);
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .form-foot a{
+    color:var(--ink-soft);
+    text-decoration:none;
+    border-bottom:1px dotted var(--ink-muted);
+  }
+  .form-foot a:hover{ color:var(--stamp-red); }
+  .form-foot .sign{
+    font-family:'Ma Shan Zheng', serif;
+    font-size:15px;
+    color:var(--ink);
+  }
+
+  /* 顶部胶带装饰（克制的一处 flourish） */
+  .tape{
+    position:absolute;
+    top:-14px; left:50%;
+    transform:translateX(-50%) rotate(-1.5deg);
+    width:160px; height:30px;
+    background:
+      linear-gradient(180deg, rgba(220,200,150,0.55), rgba(200,175,120,0.45));
+    border-left:1px dashed rgba(160,130,80,0.3);
+    border-right:1px dashed rgba(160,130,80,0.3);
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
+    z-index:6;
+  }
+  .tape::before, .tape::after{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    width:6px;
+    background:rgba(243,233,210,0.6);
+  }
+  .tape::before{ left:0; }
+  .tape::after{ right:0; }
+
+  /* 提示气泡 */
+  .hint{
+    position:fixed;
+    bottom:24px; left:50%;
+    transform:translateX(-50%);
+    background:rgba(31,34,48,0.92);
+    color:#f3e9d2;
+    font-size:12px;
+    padding:8px 16px;
+    border-radius:20px;
+    letter-spacing:1px;
+    z-index:50;
+    backdrop-filter:blur(6px);
+    opacity:0;
+    transition:opacity 0.3s;
+    pointer-events:none;
+  }
+  .hint.show{ opacity:1; }
+
+  /* ========== 可访问性：键盘焦点 + 降低动效 ========== */
+  .row:focus-visible{
+    outline:2px solid var(--stamp-red);
+    outline-offset:-2px;
+    border-radius:2px;
+  }
+  a:focus-visible{
+    outline:2px solid var(--stamp-red);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+  .row:not(.done):hover .check .box{ stroke:var(--ink); }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:0.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;
+    }
+  }
+
+  @media (max-width:640px){
+    body{ padding:12px 8px 60px; }
+    .sheet{ padding:48px 20px 60px 56px; }
+    .ruled{ left:56px; right:20px; }
+    .margin-line{ left:40px; }
+    .punch{ left:14px; }
+    .form-title{ font-size:58px; }
+    .section-title{ font-size:22px; }
+    .progress-stamp{ top:28px; right:20px; width:74px; height:74px; }
+    .progress-stamp .num{ font-size:22px; }
+    .completion-stamp{ right:24px; bottom:60px; }
+    .completion-stamp .seal{ width:108px; height:108px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 提示 -->
+<div class="hint" id="hint">点击方框即可打卡</div>
+
+<!--
+  注：这是一份纸质打卡风格的可视原型。
+  实际数据接入请回到 React 项目 (D:\MyProjects\FOMO) 把样式映射到 Header / CategorySection / SourceCard。
+-->
+<article class="sheet" id="sheet">
+  <span class="tape" aria-hidden="true"></span>
+  <span class="margin-line" aria-hidden="true"></span>
+  <span class="punch p1" aria-hidden="true"></span>
+  <span class="punch p2" aria-hidden="true"></span>
+  <span class="punch p3" aria-hidden="true"></span>
+  <div class="ruled" aria-hidden="true"></div>
+
+  <!-- 进度印章 -->
+  <div class="progress-stamp" aria-hidden="true">
+    <svg viewBox="0 0 100 100">
+      <circle class="ring-bg" cx="50" cy="50" r="44"/>
+      <circle class="ring" cx="50" cy="50" r="44"
+              stroke-dasharray="276.5"
+              stroke-dashoffset="276.5"
+              id="progressRing"
+              transform="rotate(-90 50 50)"
+              stroke-linecap="round"/>
+      <text class="num" x="50" y="50" id="progressNum">0/10</text>
+      <text class="lab" x="50" y="64">今日进度</text>
+    </svg>
+  </div>
+
+  <!-- 表头 -->
+  <header class="form-head">
+    <div>
+      <h1 class="form-title">
+        FOMO
+        <span class="sub">每 日 A I 信 息 源 打 卡 纸</span>
+      </h1>
+    </div>
+    <div class="form-meta">
+      <div><span class="lbl">日期</span><span class="val" id="dateVal">06/30</span></div>
+      <div><span class="lbl">星期</span><span class="val" id="weekVal">周二</span></div>
+      <div><span class="lbl">连续</span><span class="val streak-val" id="streakVal">0 天</span></div>
+    </div>
+  </header>
+
+  <p class="form-note">
+    ※ 依次过一遍，每看一个就在前面方框里打勾。低功耗过一遍眼睛，重要的事大概率就不会错过了。
+  </p>
+
+  <div id="sections"></div>
+
+  <!-- 完成印章 -->
+  <div class="completion-stamp" aria-hidden="true">
+    <div class="seal">
+      <div class="big">已打卡</div>
+      <div class="small">今日完美守护</div>
+    </div>
+  </div>
+
+  <footer class="form-foot">
+    <span>FOMO · 数据保存在你的浏览器本地，不上传任何信息</span>
+    <span class="sign">— AI Daily —</span>
+    <a href="https://github.com/Chasen-Liao/FOMO" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</article>
+
+<script>
+  // ===== 真实数据（来自 D:\MyProjects\FOMO\src\sources.ts） =====
+  const CATEGORIES = [
+    { id:'news',  num:'一', label:'新 闻', sources:['twitter','aihot'] },
+    { id:'blog',  num:'二', label:'博 客', sources:['anthropic','openai'] },
+    { id:'model', num:'三', label:'模 型', sources:['openrouter','huggingface','github_trending','llmstats','artificialanalysis','arena'] },
+  ];
+  const SOURCES = {
+    twitter:   { name:'Twitter / X（AI 领袖动态）', url:'#', desc:'聚合 AK、Karpathy、LeCun、Jim Fan 等顶级 AI 领袖的实时推文', preview:[[' karpathy 发布 mesos 框架讨论','2h'],['LeCun 回应世界模型可观测性','5h'],['_akhaliq 转载最新 diffusion 论文','8h']]},
+    aihot:     { name:'AIHOT', url:'#', desc:'卡兹克整理的全网 AI 每日热点，专人维护', preview:[['AI 编程大战再升级','3h'],['Sora 2 发布首周数据','6h'],['开源多模态新 SOTA','12h']]},
+    anthropic: { name:'Anthropic Research', url:'#', desc:'A 社官方研究，前沿趋势的集中来源', preview:[['Interspace: 多代理通信协议','1d'],['Claude Opus 4.6 长上下文测评','2d']]},
+    openai:    { name:'OpenAI Research', url:'#', desc:'O 社官方研究，可能定义下个阶段的趋势', preview:[['GPT-5 编程能力技术报告','1d'],['Reasoning 模型对齐新方法','3d']]},
+    openrouter:{ name:'OpenRouter Models', url:'#', desc:'新模型收录入口，价格 / 速度 / 跑分一览', hasFeed:true, preview:[['gpt-5-codex 上线','4h'],['gemini-2.6-flash 降价 40%','1d']]},
+    huggingface:{name:'Hugging Face Trending', url:'#', desc:'HF 社区每日最热门大模型、数据集和 Spaces 应用榜单', hasFeed:false},
+    github_trending:{name:'GitHub Python Trending', url:'#', desc:'GitHub 每日热门 Python 项目榜单，AI 开源项目首发地', hasFeed:false},
+    llmstats:  { name:'LLM Stats', url:'#', desc:'真实记录最新模型的发布时间线', hasFeed:false},
+    artificialanalysis:{name:'Artificial Analysis', url:'#', desc:'各大测评 SOTA 水平与变化趋势，含中美对比', hasFeed:false},
+    arena:     { name:'LMArena', url:'#', desc:'大模型盲测竞技场，社区真实比拼榜单', hasFeed:false},
+  };
+
+  const TOTAL = Object.keys(SOURCES).length;
+  const done = new Set();
+
+  // 日期
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('dateVal').textContent = `${pad(now.getMonth()+1)}/${pad(now.getDate())}`;
+  document.getElementById('weekVal').textContent  = ['周日','周一','周二','周三','周四','周五','周六'][now.getDay()];
+
+  // 渲染
+  const sectionsEl = document.getElementById('sections');
+  CATEGORIES.forEach(cat => {
+    const sec = document.createElement('section');
+    sec.className = 'section';
+
+    const head = document.createElement('div');
+    head.className = 'section-head';
+    head.innerHTML = `
+      <span class="section-num">${cat.num}、</span>
+      <span class="section-title">${cat.label}</span>
+      <span class="section-rule"></span>
+      <span class="section-meta" data-cat="${cat.id}">待打卡 <span class="cat-count">0/${cat.sources.length}</span></span>
+    `;
+    sec.appendChild(head);
+
+    const rows = document.createElement('div');
+    rows.className = 'rows';
+    cat.sources.forEach(id => {
+      const s = SOURCES[id];
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.dataset.id = id;
+
+      const previewHTML = (s.preview && s.preview.length)
+        ? `<ul class="row-preview">${s.preview.map(([t,d])=>`<li><span class="t">${t}</span><span class="d">${d}</span></li>`).join('')}</ul>`
+        : '';
+
+      const goArrow = (!s.preview || !s.preview.length)
+        ? `<span class="go-arrow">前往 ↗</span>`
+        : '';
+
+      row.innerHTML = `
+        <span class="check" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path class="box" d="M3 4.5 L20 3.5 L21 19.5 L4 20.5 Z"/>
+            <path class="tick" d="M6 12 L10 15.5 L18 7.5"/>
+          </svg>
+        </span>
+        <div class="row-body">
+          <a class="row-name" href="${s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation();event.preventDefault()">
+            ${s.name}
+            <svg class="ext" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="row-desc">${s.desc}</div>
+          ${previewHTML}
+        </div>
+        ${goArrow}
+      `;
+
+      row.setAttribute('role', 'checkbox');
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('aria-checked', 'false');
+      row.setAttribute('aria-label', `${s.name} 打卡项`);
+      row.addEventListener('click', () => toggle(id, row));
+      row.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          toggle(id, row);
+        }
+      });
+      rows.appendChild(row);
+    });
+    sec.appendChild(rows);
+    sectionsEl.appendChild(sec);
+  });
+
+  function updateSectionCount(catId, sources) {
+    const doneInCat = sources.filter(id => done.has(id)).length;
+    const meta = document.querySelector(`.section-meta[data-cat="${catId}"]`);
+    if (!meta) return;
+    if (doneInCat === sources.length) {
+      meta.innerHTML = `<span class="done-mark">✓ 全部完成</span>`;
+    } else {
+      meta.innerHTML = `待打卡 <span class="cat-count">${doneInCat}/${sources.length}</span>`;
+    }
+  }
+
+  function updateProgress() {
+    const cur = done.size;
+    const ratio = TOTAL ? cur / TOTAL : 0;
+    const circ = 2 * Math.PI * 44;
+    document.getElementById('progressRing').setAttribute('stroke-dashoffset', circ * (1 - ratio));
+    document.getElementById('progressNum').textContent = `${cur}/${TOTAL}`;
+    document.getElementById('streakVal').textContent = (cur === TOTAL ? '1 天' : '0 天');
+    document.getElementById('sheet').classList.toggle('all-done', cur === TOTAL);
+  }
+
+  function toggle(id, row) {
+    const nowDone = !done.has(id);
+    if (nowDone) {
+      done.add(id);
+      row.classList.add('done');
+    } else {
+      done.delete(id);
+      row.classList.remove('done');
+    }
+    row.setAttribute('aria-checked', nowDone ? 'true' : 'false');
+    CATEGORIES.forEach(c => updateSectionCount(c.id, c.sources));
+    updateProgress();
+  }
+
+  updateProgress();
+  CATEGORIES.forEach(c => updateSectionCount(c.id, c.sources));
+
+  // 首次提示
+  const hint = document.getElementById('hint');
+  setTimeout(()=>hint.classList.add('show'), 600);
+  setTimeout(()=>hint.classList.remove('show'), 3200);
+</script>
+</body>
+</html>
