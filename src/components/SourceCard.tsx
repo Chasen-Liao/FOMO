@@ -12,7 +12,7 @@ type Props = {
 export default function SourceCard({ source, items, loading, done, onToggle }: Props) {
   const hasFeed = !!source.feed
   const showPreview = hasFeed && items !== undefined && items.length > 0
-  const showGoArrow = !showPreview && !loading
+  const showGoArrow = !showPreview && !(hasFeed && loading)
 
   return (
     <div 
