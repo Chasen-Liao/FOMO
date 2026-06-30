@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import confetti from 'canvas-confetti'
 import { CATEGORIES, SOURCES } from './sources'
 import { fetchFeed } from './feeds'
 import { computeStreak, getDone, saveDone } from './storage'
@@ -36,16 +37,31 @@ export default function App() {
     setDone(next)
     saveDone(next)
     setStreak(computeStreak())
+
+    const total = SOURCES.length
+    if (next.length === total && total > 0 && done.length < total) {
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.75 },
+        colors: ['#8b5cf6', '#a78bfa', '#34d399', '#f59e0b', '#ec4899'],
+      })
+    }
   }
 
   const today = new Date()
   const total = SOURCES.length
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen bg-zinc-950 text-zinc-100 selection:bg-violet-500/30 overflow-x-hidden">
+      {/* 氛围渐变光晕 */}
+      <div className="pointer-events-none absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-violet-600/8 blur-[120px]" />
+      <div className="pointer-events-none absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-fuchsia-600/4 blur-[130px]" />
+      <div className="pointer-events-none absolute bottom-10 -left-20 h-[500px] w-[500px] rounded-full bg-emerald-600/4 blur-[120px]" />
+
       <Header date={today} progress={done.length} total={total} streak={streak} />
-      <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8">
-        <p className="mb-6 text-sm text-zinc-500">
+      <main className="relative z-10 mx-auto max-w-5xl px-5 py-8 sm:px-8">
+        <p className="mb-6 text-sm text-zinc-400">
           依次点过一遍，每看一个就标记完成。低功耗过一遍眼睛，重要的事大概率不会错过了。
         </p>
         {CATEGORIES.map((cat) => (
@@ -60,11 +76,11 @@ export default function App() {
           />
         ))}
       </main>
-      <footer className="border-t border-zinc-800/60 py-6 text-center text-xs text-zinc-600">
+      <footer className="relative z-10 border-t border-zinc-800/60 py-6 text-center text-xs text-zinc-600">
         <p>
           FOMO · 每日 AI 信息源追踪 ·{' '}
           <a
-            className="text-zinc-500 hover:text-violet-300"
+            className="text-zinc-500 hover:text-violet-300 transition-colors"
             href="https://github.com/Chasen-Liao/FOMO"
             target="_blank"
             rel="noreferrer noopener"
