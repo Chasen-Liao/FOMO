@@ -16,6 +16,28 @@ export default function App() {
   useEffect(() => setStreak(computeStreak()), [])
 
   useEffect(() => {
+    const glow = document.getElementById('mouse-glow')
+    if (!glow) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      glow.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
+      glow.style.opacity = '1'
+    }
+
+    const handleMouseLeave = () => {
+      glow.style.opacity = '0'
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [])
+
+  useEffect(() => {
     let active = true
     const feedSources = SOURCES.filter((s) => s.feed)
     Promise.all(
@@ -54,6 +76,13 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 selection:bg-violet-500/30 overflow-x-hidden">
+      {/* 鼠标跟随动态微光 */}
+      <div
+        id="mouse-glow"
+        className="pointer-events-none fixed -left-[150px] -top-[150px] h-[300px] w-[300px] rounded-full bg-violet-500/12 blur-[100px] transition-opacity duration-700 opacity-0 will-change-transform"
+        style={{ transform: 'translate3d(0px, 0px, 0)' }}
+      />
+
       {/* 氛围渐变光晕 */}
       <div className="pointer-events-none absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-violet-600/12 blur-[130px] animate-float-1" />
       <div className="pointer-events-none absolute top-1/4 -right-40 h-[700px] w-[700px] rounded-full bg-fuchsia-600/8 blur-[145px] animate-float-2" />
