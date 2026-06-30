@@ -18,12 +18,13 @@
   --desk:         #2a2018;        /* 桌面底色 */
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
-html,body, #root{ height:100%; }
+html,body, #root{ min-height:100%; }
 body{
   font-family:'Noto Serif SC', 'Songti SC', 'STSong', serif;
   color:var(--ink);
   background:
     radial-gradient(ellipse at 50% 0%, #3a2d20 0%, var(--desk) 60%, #1a1209 100%);
+  background-attachment: fixed;
   min-height:100vh;
   padding:32px 16px 80px;
   -webkit-font-smoothing:antialiased;
