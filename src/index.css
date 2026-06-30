@@ -563,3 +563,38 @@ a:focus-visible{
   }
 }
 
+/* ========== 作者签名 ========== */
+.author-signature {
+  position: fixed;
+  left: 24px;
+  bottom: 20px;
+  font-family: 'Caveat', cursive;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--paper);
+  opacity: 0.3;
+  letter-spacing: 1px;
+  text-decoration: none;
+  z-index: 10;
+  transition: opacity 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.author-signature:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+@media (max-width: 640px) {
+  .author-signature {
+    position: static;
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 24px;
+    color: var(--paper);
+    opacity: 0.4;
+  }
+}
+
+

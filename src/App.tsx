@@ -162,6 +162,15 @@ export default function App() {
           </a>
         </footer>
       </article>
+
+      <a
+        href="https://github.com/Chasen-Liao"
+        target="_blank"
+        rel="noreferrer noopener"
+        className="author-signature"
+      >
+        chasen
+      </a>
     </>
   )
 }
