@@ -1462,8 +1462,8 @@
       );
       const nextFeeds = Object.fromEntries(results);
 
-      // 如果抓取空但缓存有，则保留缓存
-      if (cache) {
+      // 普通刷新可用旧缓存兜底；强制刷新必须清掉过期残留。
+      if (!force && cache) {
         for (const [id, items] of Object.entries(nextFeeds)) {
           if (items.length === 0 && cache.feeds[id] && cache.feeds[id].length > 0) {
             nextFeeds[id] = cache.feeds[id];

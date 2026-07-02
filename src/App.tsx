@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CATEGORIES, SOURCES } from './sources'
 import { fetchFeed } from './feeds'
+import { applyFeedCacheFallback } from './feedCachePolicy'
 import { computeStreak, getDone, saveDone, getFeedsCache, saveFeedsCache } from './storage'
 import type { FeedItem } from './types'
 import Header from './components/Header'
@@ -47,15 +48,7 @@ export default function App() {
       const entries = await Promise.all(
         feedSources.map(async (s) => [s.id, await fetchFeed(s)] as const)
       )
-      const nextFeeds = Object.fromEntries(entries)
-
-      if (cache) {
-        for (const [id, items] of Object.entries(nextFeeds)) {
-          if (items.length === 0 && cache.feeds[id] && cache.feeds[id].length > 0) {
-            nextFeeds[id] = cache.feeds[id]
-          }
-        }
-      }
+      const nextFeeds = applyFeedCacheFallback(Object.fromEntries(entries), cache?.feeds, force)
 
       setFeeds(nextFeeds)
       saveFeedsCache(nextFeeds, now)
