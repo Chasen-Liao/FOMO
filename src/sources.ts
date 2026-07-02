@@ -6,7 +6,7 @@ export const SOURCES: Source[] = [
     id: 'twitter',
     name: 'Twitter / X (AI 领袖动态)',
     category: 'news',
-    url: 'https://x.com/search?q=(AI%20OR%20LLM)%20(from%3A_akhaliq%20OR%20from%3Akarpathy%20OR%20from%3Aylecun%20OR%20from%3ADrJimFan%20OR%20from%3Aswyx)&f=live',
+    url: 'https://x.com/search?q=(AI%20OR%20LLM)%20(from%3A_akhaliq%20OR%20from%3Akarpathy%20OR%20from%3Aylecun%20OR%20from%3ADrJimFan)&f=live',
     desc: '聚合 AK、Karpathy、LeCun、Jim Fan 等顶级 AI 领袖的实时推文，自动过滤杂音',
   },
   {

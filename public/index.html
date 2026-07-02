@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>FOMO · 每日 AI 信息源打卡纸</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -899,7 +900,7 @@
       id: 'twitter',
       name: 'Twitter / X (AI 领袖动态)',
       category: 'news',
-      url: 'https://x.com/search?q=(AI%20OR%20LLM)%20(from%3A_akhaliq%20OR%20from%3Akarpathy%20OR%20from%3Aylecun%20OR%20from%3ADrJimFan%20OR%20from%3Aswyx)&f=live',
+      url: 'https://x.com/search?q=(AI%20OR%20LLM)%20(from%3A_akhaliq%20OR%20from%3Akarpathy%20OR%20from%3Aylecun%20OR%20from%3ADrJimFan)&f=live',
       desc: '聚合 AK、Karpathy、LeCun、Jim Fan 等顶级 AI 领袖的实时推文，自动过滤杂音',
       defaultPreview: [
         ['karpathy: mesos-scale LLM training is fascinating', '2 小时前'],
@@ -1277,10 +1278,12 @@
             <ul class="row-preview" style="opacity: 0.8">
               ${s.defaultPreview.map(([title, time, url]) => `
                 <li>
-                  <a href="${url || s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
-                    <span class="t">${title}</span>
-                    <span class="d">${time}</span>
-                  </a>
+                  ${url
+                    ? `<a href="${url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                        <span class="t">${title}</span>
+                        <span class="d">${time}</span>
+                      </a>`
+                    : `<span class="t">${title}</span><span class="d">${time}</span>`}
                 </li>
               `).join('')}
             </ul>`;
@@ -1289,10 +1292,12 @@
             <ul class="row-preview" style="opacity: 0.8">
               ${s.defaultPreview.map(([title, time, url]) => `
                 <li>
-                  <a href="${url || s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
-                    <span class="t">${title}</span>
-                    <span class="d">${time}</span>
-                  </a>
+                  ${url
+                    ? `<a href="${url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                        <span class="t">${title}</span>
+                        <span class="d">${time}</span>
+                      </a>`
+                    : `<span class="t">${title}</span><span class="d">${time}</span>`}
                 </li>
               `).join('')}
             </ul>`;
