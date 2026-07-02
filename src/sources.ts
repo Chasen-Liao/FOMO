@@ -15,6 +15,7 @@ export const SOURCES: Source[] = [
     category: 'news',
     url: 'https://aihot.virxact.com/',
     desc: '卡兹克整理的全网 AI 每日热点，专人维护',
+    feed: { kind: 'rss', url: 'https://aihot.virxact.com/feed.xml' },
   },
   // 博客
   {
