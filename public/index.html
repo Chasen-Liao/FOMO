@@ -30,13 +30,17 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  
+  html { min-height: 100%; }
+
   body {
     font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
     color: var(--ink);
-    background: 
+    background-color: var(--desk);
+    background-image:
       radial-gradient(ellipse at 50% 20%, #2c2520 0%, var(--desk) 80%, #0d0b0a 100%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     min-height: 100vh;
     padding: 40px 16px 100px;
     -webkit-font-smoothing: antialiased;
