@@ -1,0 +1,1479 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FOMO · 每日 AI 信息源打卡纸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 10岁童趣蜡笔白纸色板 */
+    --paper:        #faf7f0;        /* 奶油色白纸背景 */
+    --paper-light:  #fdfcf7;        /* 明亮高光区域 */
+    --paper-shade:  #f0ebe0;        /* 纸底阴影 */
+    --ink:          #242630;        /* 墨黑 */
+    --ink-soft:     #424555;        /* 软碳黑 */
+    --ink-muted:    #82889a;        /* 浅灰墨 */
+    --rule:         #d4cfc3;        /* 铅笔横格线 */
+    --rule-soft:    rgba(212, 207, 195, 0.5);
+    
+    --margin-red:   #e74c3c;        /* 蜡笔装订红 */
+    --stamp-red:    #c0392b;        /* 红色印泥 */
+    --done-green:   #27ae60;        /* 勾选植物绿 */
+    --crayon-yellow:#f1c40f;        /* 蜡笔黄 */
+    --crayon-blue:  #3498db;        /* 蜡笔蓝 */
+    --crayon-pink:  #e84393;        /* 蜡笔粉 */
+    
+    --desk:         #1e1b18;        /* 怀旧书桌底色 */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  
+  body {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+    color: var(--ink);
+    background: 
+      radial-gradient(ellipse at 50% 20%, #2c2520 0%, var(--desk) 80%, #0d0b0a 100%);
+    min-height: 100vh;
+    padding: 40px 16px 100px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ========== 蜡笔手绘 SVG 滤镜效果 ========== */
+  .rough-handdrawn {
+    filter: url(#handdrawn-filter);
+  }
+  .crayon-stroke {
+    filter: url(#crayon-filter);
+  }
+  .stamp-ink {
+    filter: url(#stamp-filter);
+  }
+
+  /* ========== 纸张容器 ========== */
+  .sheet {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--paper);
+    position: relative;
+    padding: 64px 48px 80px 88px;
+    border-radius: 4px;
+    box-shadow:
+      0 4px 10px rgba(0,0,0,0.15),
+      0 20px 45px rgba(0,0,0,0.35),
+      inset 0 0 80px rgba(212,207,195,0.25);
+    background-image:
+      radial-gradient(ellipse at 15% 15%, rgba(255, 255, 255, 0.6), transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(200, 180, 150, 0.08), transparent 60%);
+    animation: sheetDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1) both;
+    filter: url(#handdrawn-filter);
+  }
+
+  @keyframes sheetDrop {
+    0%   { opacity: 0; transform: translateY(30px) rotate(-1deg); }
+    100% { opacity: 1; transform: translateY(0) rotate(0); }
+  }
+
+  /* 纸张表面微噪点，模拟实体质感 */
+  .sheet::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: 4px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.15 0 0 0 0 0.12 0 0 0 0 0.08 0 0 0 0.12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 纸张四周轻微磨损和叠影效果 */
+  .sheet-border-shadow {
+    position: absolute;
+    inset: 4px -4px -4px 4px;
+    background: var(--paper-shade);
+    border-radius: 4px;
+    z-index: -1;
+    filter: url(#handdrawn-filter);
+    opacity: 0.8;
+  }
+
+  .sheet > * { position: relative; z-index: 2; }
+
+  /* 仅在顶部说明区域保留装饰性铅笔格线 */
+  .ruled {
+    position: absolute;
+    left: 88px; right: 48px;
+    top: 240px; height: 40px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 39px,
+      var(--rule-soft) 39px,
+      var(--rule-soft) 40px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 左侧红色手绘装订线（双线） */
+  .margin-line {
+    position: absolute;
+    left: 68px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--margin-red);
+    opacity: 0.45;
+    z-index: 1;
+    filter: url(#handdrawn-filter);
+  }
+  .margin-line::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--margin-red);
+    opacity: 0.35;
+  }
+
+  /* 活页装订孔 */
+  .punch {
+    position: absolute;
+    left: 20px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--desk);
+    box-shadow:
+      inset 0 2px 3px rgba(0,0,0,0.8),
+      0 0 0 2px rgba(212, 207, 195, 0.4);
+    z-index: 3;
+  }
+  .punch.p1 { top: 120px; }
+  .punch.p2 { top: 50%; transform: translateY(-50%); }
+  .punch.p3 { bottom: 120px; }
+
+  /* ========== 蜡笔手绘涂鸦 (纯 SVG，绝无 Emoji) ========== */
+  .doodle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.85;
+    filter: url(#crayon-filter);
+  }
+  .doodle-star-1 {
+    top: 45px;
+    left: 120px;
+    width: 28px; height: 28px;
+    fill: var(--crayon-yellow);
+    transform: rotate(-15deg);
+  }
+  .doodle-star-2 {
+    bottom: 50px;
+    left: 45px;
+    width: 24px; height: 24px;
+    fill: var(--crayon-yellow);
+    transform: rotate(20deg);
+  }
+  .doodle-heart-1 {
+    top: 130px;
+    right: 180px;
+    width: 22px; height: 22px;
+    fill: var(--crayon-pink);
+    transform: rotate(12deg);
+  }
+  .doodle-heart-2 {
+    bottom: 120px;
+    right: 50px;
+    width: 26px; height: 26px;
+    fill: var(--crayon-pink);
+    transform: rotate(-18deg);
+  }
+  .doodle-cloud {
+    top: 30px;
+    right: 200px;
+    width: 58px; height: 38px;
+    fill: #e8f4f8;
+    stroke: var(--crayon-blue);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .doodle-rainbow {
+    bottom: 30px;
+    left: 120px;
+    width: 90px; height: 50px;
+  }
+
+  /* ========== 表头 ========== */
+  .form-head {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    filter: url(#handdrawn-filter);
+  }
+  .form-title {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: 76px;
+    line-height: 0.95;
+    color: var(--ink);
+    position: relative;
+    letter-spacing: -0.02em;
+  }
+  .form-title .title-underline {
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 12px;
+    pointer-events: none;
+    filter: url(#crayon-filter);
+  }
+  .form-title .sub {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink-soft);
+    letter-spacing: 4px;
+    display: block;
+    margin-top: 14px;
+    opacity: 0.85;
+  }
+  
+  .form-meta {
+    text-align: right;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+  }
+  .form-meta .lbl {
+    color: var(--ink-muted);
+    margin-right: 6px;
+  }
+  .form-meta .val {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--ink);
+    border-bottom: 1.5px dashed var(--ink-muted);
+    padding: 0 8px;
+    min-width: 55px;
+    display: inline-block;
+    text-align: center;
+    transform: rotate(-1deg);
+  }
+  .form-meta .streak-val {
+    color: var(--stamp-red);
+    font-size: 22px;
+  }
+
+  .form-note {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.6;
+    padding: 10px 0 20px;
+    border-bottom: 1px dashed var(--rule);
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ========== 进度盖章 (Crayon & Stamp Filter) ========== */
+  .progress-stamp {
+    position: absolute;
+    top: 48px; right: 180px;
+    width: 100px; height: 100px;
+    z-index: 4;
+    transform: rotate(-8deg);
+    filter: url(#stamp-filter);
+    user-select: none;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .progress-stamp svg { width: 100%; height: 100%; }
+  .progress-stamp .ring {
+    fill: none;
+    stroke: var(--stamp-red);
+    stroke-width: 3;
+    transition: stroke-dashoffset 0.4s ease-out;
+  }
+  .progress-stamp .ring-bg {
+    fill: none;
+    stroke: var(--stamp-red);
+    stroke-width: 1;
+    opacity: 0.15;
+  }
+  .progress-stamp text {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    fill: var(--stamp-red);
+  }
+  .progress-stamp .num {
+    font-size: 26px;
+    font-weight: bold;
+    text-anchor: middle;
+  }
+  .progress-stamp .lab {
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-anchor: middle;
+  }
+
+  /* ========== 章节部分 ========== */
+  .section { margin-bottom: 40px; }
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+    padding-bottom: 4px;
+    filter: url(#handdrawn-filter);
+  }
+  .section-num {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: 32px;
+    color: var(--stamp-red);
+    transform: rotate(-3deg);
+  }
+  .section-title {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: 24px;
+    color: var(--ink);
+    letter-spacing: 2px;
+  }
+  .section-rule {
+    flex: 1;
+    height: 0;
+    border-bottom: 2px solid var(--ink-soft);
+    opacity: 0.45;
+  }
+  .section-meta {
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .section-meta .done-mark {
+    color: var(--done-green);
+    font-weight: bold;
+  }
+
+  /* ========== 打卡行 ========== */
+  .rows { display: flex; flex-direction: column; }
+  .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 8px;
+    min-height: 52px;
+    border-bottom: 1.5px dashed var(--rule-soft);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    filter: url(#handdrawn-filter);
+  }
+  .row:hover {
+    background: rgba(212, 207, 195, 0.16);
+  }
+  
+  /* 手绘勾选方框 */
+  .check {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    margin-top: 2px;
+    position: relative;
+  }
+  .check svg { width: 100%; height: 100%; display: block; }
+  .check .box {
+    fill: none;
+    stroke: var(--ink-soft);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s;
+  }
+  .check .tick {
+    fill: none;
+    stroke: var(--done-green);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    transition: stroke-dashoffset 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    filter: url(#stamp-filter);
+  }
+  
+  .row.done .check .tick {
+    stroke-dashoffset: 0;
+  }
+  .row.done .check .box {
+    stroke: var(--done-green);
+  }
+  
+  /* 模拟红色图章按压时的物理回弹动效 */
+  .row.done .check .tick {
+    animation: stampPress 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  @keyframes stampPress {
+    0%   { transform: scale(1.8) rotate(-15deg); opacity: 0; }
+    50%  { transform: scale(0.85) rotate(5deg); opacity: 0.9; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+
+  .row-body { flex: 1; min-width: 0; padding-top: 3px; }
+  .row-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.3;
+  }
+  .row-name:hover { color: var(--stamp-red); }
+  .row-name .ext {
+    width: 12px; height: 12px;
+    opacity: 0.4;
+    transition: transform 0.2s;
+  }
+  .row-name:hover .ext {
+    transform: translate(2px, -2px);
+  }
+  .row.done .row-name {
+    color: var(--ink-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--done-green);
+    text-decoration-thickness: 2px;
+  }
+  
+  .row-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-top: 4px;
+    opacity: 0.85;
+    max-width: 65ch;
+  }
+  
+  .row.done .row-desc {
+    color: var(--ink-muted);
+  }
+
+  /* ========== RSS 缓存与刷新 ========== */
+  .feed-cache-info {
+    font-size: 12px;
+    color: var(--ink-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-refresh {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .btn-refresh:hover {
+    color: var(--stamp-red);
+    background: rgba(212, 207, 195, 0.2);
+  }
+  .btn-refresh:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ========== 动态预览区域 ========== */
+  .row-preview {
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-left: 2px dashed var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .row-preview li {
+    list-style: none;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  .row-preview li a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    gap: 12px;
+  }
+  .row-preview li a:hover {
+    color: var(--stamp-red);
+  }
+  .row-preview li .t {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80%;
+  }
+  .row-preview li .d {
+    color: var(--crayon-blue);
+    font-size: 11px;
+    font-family: 'Caveat', cursive;
+    flex-shrink: 0;
+  }
+  
+  .go-arrow {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    align-self: center;
+    opacity: 0.7;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .row:hover .go-arrow {
+    opacity: 1;
+    color: var(--stamp-red);
+  }
+
+  /* ========== 完美通关大印章 (墨迹效果) ========== */
+  .completion-stamp {
+    position: absolute;
+    bottom: 120px;
+    right: 90px;
+    width: 140px; height: 140px;
+    border: 4px double var(--stamp-red);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-15deg) scale(1.5);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    filter: url(#stamp-filter);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+  }
+  .sheet.all-done .completion-stamp {
+    animation: stampDropLarge 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+  .completion-stamp .seal-inner {
+    border: 1.5px solid var(--stamp-red);
+    border-radius: 50%;
+    width: 124px; height: 124px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .completion-stamp .big {
+    font-family: 'ZCOOL KuaiLe', sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--stamp-red);
+    letter-spacing: 2px;
+  }
+  .completion-stamp .small {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 600;
+    font-size: 10px;
+    color: var(--stamp-red);
+    letter-spacing: 1px;
+    margin-top: 4px;
+    border-top: 1px dashed var(--stamp-red);
+    padding-top: 4px;
+  }
+
+  /* ========== 底部页脚 ========== */
+  .form-foot {
+    border-top: 1.5px solid var(--ink-soft);
+    padding-top: 16px;
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    filter: url(#handdrawn-filter);
+  }
+  .form-foot a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .form-foot a:hover {
+    color: var(--stamp-red);
+    text-decoration: underline;
+  }
+  .form-foot .sign {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--ink-soft);
+  }
+
+  /* ========== chasen 手写签名 ========== */
+  .author-signature {
+    position: fixed;
+    left: 24px;
+    bottom: 20px;
+    font-family: 'Caveat', cursive;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--paper);
+    opacity: 0.35;
+    letter-spacing: 1px;
+    text-decoration: none;
+    z-index: 10;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .author-signature:hover {
+    opacity: 0.85;
+    color: var(--crayon-yellow);
+    transform: scale(1.05) rotate(-2deg);
+  }
+
+  /* 提示框 */
+  .hint {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    background: rgba(36, 38, 48, 0.95);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: 2000;
+    letter-spacing: 1px;
+  }
+  .hint.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* 手绘感铅笔加载动画 */
+  @keyframes pencilWiggle {
+    0%, 100% { transform: rotate(-5deg) translate(0, 0); }
+    50% { transform: rotate(18deg) translate(2px, -3px); }
+  }
+
+  /* 终极打卡完成大印章落地动画 */
+  @keyframes stampDropLarge {
+    0% { transform: rotate(-30deg) scale(2.2); opacity: 0; }
+    45% { transform: rotate(-10deg) scale(0.9); opacity: 0.9; }
+    70% { transform: rotate(-14deg) scale(1.1); opacity: 0.95; }
+    100% { transform: rotate(-12deg) scale(1); opacity: 0.85; }
+  }
+
+  /* 彩蛋：手绘纸屑坠落动画 */
+  .confetti-doodle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9;
+    filter: url(#crayon-filter);
+    animation: confettiFall 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-50px) rotate(0deg) scale(0.5); opacity: 0; }
+    15% { opacity: 0.95; }
+    100% { transform: translateY(500px) rotate(360deg) scale(1.2); opacity: 0; }
+  }
+
+  /* ========== 响应式细节 ========== */
+  @media (max-width: 640px) {
+    body {
+      padding: 16px 8px 60px;
+    }
+    .sheet {
+      padding: 48px 24px 60px 56px;
+    }
+    .ruled {
+      left: 56px; right: 24px;
+    }
+    .margin-line {
+      left: 44px;
+    }
+    .punch {
+      left: 12px;
+      width: 12px; height: 12px;
+    }
+    .form-title {
+      font-size: 54px;
+    }
+    .form-meta {
+      text-align: left;
+      width: 100%;
+      margin-top: 12px;
+    }
+    .progress-stamp {
+      top: 24px; right: 16px;
+      width: 76px; height: 76px;
+    }
+    .doodle-cloud {
+      display: none;
+    }
+    .doodle-star-1 {
+      left: 60px;
+    }
+    .completion-stamp {
+      bottom: 80px;
+      right: 40px;
+      width: 110px; height: 110px;
+    }
+    .completion-stamp .seal-inner {
+      width: 96px; height: 96px;
+    }
+    .completion-stamp .big {
+      font-size: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- 首次使用小纸条提示 -->
+<div class="hint" id="hint">点 击 方 框 即可打卡</div>
+
+<!-- 实体蜡笔白纸 -->
+<article class="sheet" id="sheet">
+  <div class="sheet-border-shadow"></div>
+  
+  <!-- 活页孔与横格线 -->
+  <span class="margin-line" aria-hidden="true"></span>
+  <span class="punch p1" aria-hidden="true"></span>
+  <span class="punch p2" aria-hidden="true"></span>
+  <span class="punch p3" aria-hidden="true"></span>
+  <div class="ruled" aria-hidden="true"></div>
+
+  <!-- 蜡笔手绘涂鸦点缀 -->
+  <svg class="doodle doodle-star-1" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z"/>
+  </svg>
+  <svg class="doodle doodle-star-2" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z"/>
+  </svg>
+  <svg class="doodle doodle-heart-1" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 4.419C12.441 3.326 13.567 2 15.632 2 19.102 2 22 4.887 22 8.441c0 4.673-5.241 8.878-10 13.559-4.759-4.681-10-8.886-10-13.559C2 4.887 4.898 2 8.368 2c2.065 0 3.191 1.326 3.632 2.419z"/>
+  </svg>
+  <svg class="doodle doodle-heart-2" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 4.419C12.441 3.326 13.567 2 15.632 2 19.102 2 22 4.887 22 8.441c0 4.673-5.241 8.878-10 13.559-4.759-4.681-10-8.886-10-13.559C2 4.887 4.898 2 8.368 2c2.065 0 3.191 1.326 3.632 2.419z"/>
+  </svg>
+  <svg class="doodle doodle-cloud" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+  </svg>
+  
+  <svg class="doodle doodle-rainbow" viewBox="0 0 100 50" aria-hidden="true">
+    <path d="M15,45 C25,20 75,20 85,45" fill="none" stroke="var(--crayon-pink)" stroke-width="4.5" stroke-linecap="round" />
+    <path d="M25,45 C33,26 67,26 75,45" fill="none" stroke="var(--crayon-yellow)" stroke-width="4.5" stroke-linecap="round" />
+    <path d="M35,45 C42,32 58,32 65,45" fill="none" stroke="var(--crayon-blue)" stroke-width="4.5" stroke-linecap="round" />
+  </svg>
+
+  <!-- 进度印章 -->
+  <div class="progress-stamp" aria-hidden="true">
+    <svg viewBox="0 0 100 100">
+      <circle class="ring-bg" cx="50" cy="50" r="44"/>
+      <circle class="ring" cx="50" cy="50" r="44"
+              stroke-dasharray="276.5"
+              stroke-dashoffset="276.5"
+              id="progressRing"
+              transform="rotate(-90 50 50)"
+              stroke-linecap="round"/>
+      <text class="num" x="50" y="50" id="progressNum">0/10</text>
+      <text class="lab" x="50" y="66">今日进度</text>
+    </svg>
+  </div>
+
+  <!-- 表头 -->
+  <header class="form-head">
+    <div>
+      <h1 class="form-title">
+        FOMO
+        <svg class="title-underline" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0,5 Q15,1 35,6 T70,4 T100,5" fill="none" stroke="var(--crayon-pink)" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span class="sub">每日 AI 前沿信息源打卡纸</span>
+      </h1>
+    </div>
+    <div class="form-meta">
+      <div><span class="lbl">日期</span><span class="val" id="dateVal">07/02</span></div>
+      <div><span class="lbl">星期</span><span class="val" id="weekVal">周四</span></div>
+      <div><span class="lbl">连续</span><span class="val streak-val" id="streakVal">0 天</span></div>
+    </div>
+  </header>
+
+  <!-- 说明与缓存控制 -->
+  <p class="form-note">
+    <span>※ 依次过一遍，每看一个就在前面方框里打勾。低功耗过一遍眼睛，重要的事大概率就不会错过了。</span>
+    <span class="feed-cache-info" id="feedCacheInfo">正在检测缓存状态...</span>
+  </p>
+
+  <!-- 动态打卡章节 -->
+  <div id="sections"></div>
+
+  <!-- 完成大印章 -->
+  <div class="completion-stamp" aria-hidden="true">
+    <div class="seal-inner">
+      <div class="big">已打卡</div>
+      <div class="small">今日完美守护</div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="form-foot">
+    <span>FOMO · 数据保存在你的浏览器本地，不上传任何信息</span>
+    <span class="sign">— AI Daily —</span>
+    <a href="https://github.com/Chasen-Liao/FOMO" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</article>
+
+<!-- 固定署名 -->
+<a href="https://github.com/Chasen-Liao" target="_blank" rel="noreferrer noopener" class="author-signature">
+  chasen
+</a>
+
+<!-- SVG 粗糙和手绘蜡笔滤镜包 -->
+<svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+  <defs>
+    <!-- 手绘歪扭粗糙滤镜 -->
+    <filter id="handdrawn-filter" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    
+    <!-- 蜡笔笔触磨砂颗粒滤镜 -->
+    <filter id="crayon-filter" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.18 0" result="coloredNoise"/>
+      <feComposite operator="in" in2="SourceGraphic" />
+    </filter>
+
+    <!-- 盖章斑驳渗墨滤镜 -->
+    <filter id="stamp-filter" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.18" numOctaves="2" result="noise" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.4 0" result="coloredNoise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+      <feComposite operator="in" in2="SourceGraphic" />
+    </filter>
+  </defs>
+</svg>
+
+<script>
+  // ===== 真实数据 (已与 D:\MyProjects\FOMO\src\sources.ts 完美同步) =====
+  const CATEGORIES = [
+    { id: 'news',  num: '一', label: '新 闻' },
+    { id: 'blog',  num: '二', label: '博 客' },
+    { id: 'model', num: '三', label: '模 型' },
+  ];
+
+  const SOURCES = [
+    {
+      id: 'twitter',
+      name: 'Twitter / X (AI 领袖动态)',
+      category: 'news',
+      url: 'https://x.com/search?q=(AI%20OR%20LLM)%20(from%3A_akhaliq%20OR%20from%3Akarpathy%20OR%20from%3Aylecun%20OR%20from%3ADrJimFan%20OR%20from%3Aswyx)&f=live',
+      desc: '聚合 AK、Karpathy、LeCun、Jim Fan 等顶级 AI 领袖的实时推文，自动过滤杂音',
+      defaultPreview: [
+        ['karpathy: mesos-scale LLM training is fascinating', '2 小时前'],
+        ['LeCun: World models represent the correct path to AI', '5 小时前'],
+        ['_akhaliq: Posted 5 new SOTA image diffusion architectures', '8 小时前']
+      ]
+    },
+    {
+      id: 'aihot',
+      name: 'AIHOT',
+      category: 'news',
+      url: 'https://aihot.virxact.com/',
+      desc: '卡兹克整理的全网 AI 每日热点，专人维护',
+      defaultPreview: [
+        ['Sora 2 爆火内测，生成画质翻倍', '3 小时前'],
+        ['国内最新大模型跑分打平 GPT-4o', '6 小时前'],
+        ['AI 智能代理在软件工程中的落地现状', '12 小时前']
+      ]
+    },
+    {
+      id: 'anthropic',
+      name: 'Anthropic Research',
+      category: 'blog',
+      url: 'https://www.anthropic.com/research',
+      desc: 'A 社官方研究，前沿趋势的集中来源',
+      feed: { kind: 'rss', url: 'https://www.anthropic.com/news/rss.xml' },
+      defaultPreview: [
+        ['Interspace: Multi-agent communication standard', '1 天前'],
+        ['Evaluating context length limitations of Claude 3.5', '2 天前']
+      ]
+    },
+    {
+      id: 'openai',
+      name: 'OpenAI Research',
+      category: 'blog',
+      url: 'https://openai.com/research/',
+      desc: 'O 社官方研究，可能定义下个阶段的趋势',
+      feed: { kind: 'rss', url: 'https://openai.com/blog/rss.xml' },
+      defaultPreview: [
+        ['GPT-5 programming benchmark report', '1 天前'],
+        ['New alignment methods for Reasoning models', '3 天前']
+      ]
+    },
+    {
+      id: 'openrouter',
+      name: 'OpenRouter Models',
+      category: 'model',
+      url: 'https://openrouter.ai/models',
+      desc: '新模型收录入口，价格 / 速度 / 跑分一览',
+      feed: { kind: 'openrouter' },
+      defaultPreview: [
+        ['gpt-5-preview is now online', '4 小时前'],
+        ['gemini-2.5-flash price reduced by 40%', '1 天前']
+      ]
+    },
+    {
+      id: 'huggingface',
+      name: 'Hugging Face Trending',
+      category: 'model',
+      url: 'https://huggingface.co/trending',
+      desc: 'HF 社区每日最热门大模型、数据集和 Spaces 应用榜单',
+    },
+    {
+      id: 'github_trending',
+      name: 'GitHub Python Trending',
+      category: 'model',
+      url: 'https://github.com/trending/python?since=daily',
+      desc: 'GitHub 每日热门 Python 项目榜单，AI 开源项目首发地',
+    },
+    {
+      id: 'llmstats',
+      name: 'LLM Stats',
+      category: 'model',
+      url: 'https://llm-stats.com/llm-updates',
+      desc: '真实记录最新模型的发布时间线',
+    },
+    {
+      id: 'artificialanalysis',
+      name: 'Artificial Analysis',
+      category: 'model',
+      url: 'https://artificialanalysis.ai/',
+      desc: '各大测评 SOTA 水平与变化趋势，含中美对比',
+    },
+    {
+      id: 'arena',
+      name: 'LMArena',
+      category: 'model',
+      url: 'https://arena.ai/leaderboard/code/webdev',
+      desc: '大模型盲测竞技场，社区真实比拼榜单',
+    }
+  ];
+
+  const TOTAL = SOURCES.length;
+  let done = [];
+  let feeds = {};
+  let feedsLoaded = false;
+  let refreshing = false;
+
+  // ===== 日期计算与填充 =====
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('dateVal').textContent = `${pad(now.getMonth()+1)}/${pad(now.getDate())}`;
+  document.getElementById('weekVal').textContent  = ['周日','周一','周二','周三','周四','周五','周六'][now.getDay()];
+
+  // ===== 存储管理 (与 React 项目 storage.ts 完美同步) =====
+  const dateKey = (d = new Date()) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `fomo:${y}-${m}-${day}`;
+  };
+
+  const getDone = () => {
+    try {
+      const raw = localStorage.getItem(dateKey());
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveDone = (ids) => {
+    try {
+      localStorage.setItem(dateKey(), JSON.stringify(ids));
+    } catch {}
+  };
+
+  // 连续打卡计算
+  const computeStreak = () => {
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 365; i++) {
+      let hasRecord = false;
+      try {
+        const raw = localStorage.getItem(dateKey(d));
+        const arr = raw ? JSON.parse(raw) : [];
+        hasRecord = Array.isArray(arr) && arr.length > 0;
+      } catch {
+        hasRecord = false;
+      }
+      if (hasRecord) {
+        streak++;
+      } else if (i > 0) {
+        break;
+      }
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  };
+
+  const FEEDS_CACHE_KEY = 'fomo:feeds_cache';
+  
+  const getFeedsCache = () => {
+    try {
+      const raw = localStorage.getItem(FEEDS_CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed.updatedAt === 'number' && parsed.feeds) {
+        return parsed;
+      }
+    } catch {}
+    return null;
+  };
+
+  const saveFeedsCache = (f, updatedAt = Date.now()) => {
+    try {
+      localStorage.setItem(FEEDS_CACHE_KEY, JSON.stringify({ updatedAt, feeds: f }));
+    } catch {}
+  };
+
+  // 相对时间
+  const relativeTime = (iso) => {
+    if (!iso) return '';
+    const t = new Date(iso).getTime();
+    if (Number.isNaN(t)) return '';
+    const diff = Date.now() - t;
+    const day = 86400000;
+    if (diff < 0) return '刚刚';
+    const days = Math.floor(diff / day);
+    if (days < 1) {
+      const hours = Math.floor(diff / 3600000);
+      if (hours < 1) return `${Math.max(1, Math.floor(diff / 60000))} 分钟前`;
+      return `${hours} 小时前`;
+    }
+    if (days < 30) return `${days} 天前`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} 个月前`;
+    return `${Math.floor(months / 12)} 年前`;
+  };
+
+  // ===== RSS CORS 代理与抓取 (与 D:\MyProjects\FOMO\src\feeds.ts 同步) =====
+  const PROXIES = [
+    (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
+  ];
+
+  const withTimeout = (ms) => {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    return { signal: ctrl.signal, clear: () => clearTimeout(t) };
+  };
+
+  const fetchViaProxy = async (url, timeoutMs = 10000) => {
+    let lastErr;
+    for (const wrap of PROXIES) {
+      const { signal, clear } = withTimeout(timeoutMs);
+      try {
+        const res = await fetch(wrap(url), { signal });
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.length > 0) return text;
+        }
+      } catch (e) {
+        lastErr = e;
+      } finally {
+        clear();
+      }
+    }
+    throw lastErr || new Error('所有 RSS 代理均失败');
+  };
+
+  const parseRss = (xml, limit = 3) => {
+    const doc = new DOMParser().parseFromString(xml, 'text/xml');
+    const nodes = Array.from(doc.querySelectorAll('item, entry')).slice(0, limit);
+    return nodes
+      .map((it) => {
+        const title = it.querySelector('title')?.textContent?.trim() ?? '';
+        const link =
+          it.querySelector('link')?.textContent?.trim() ||
+          it.querySelector('link')?.getAttribute('href') ||
+          '';
+        const date =
+          it.querySelector('pubDate, published, updated')?.textContent?.trim() || undefined;
+        return { title, url: link, publishedAt: date };
+      })
+      .filter((x) => x.title && x.url);
+  };
+
+  const fetchOpenRouter = async (limit = 3) => {
+    const { signal, clear } = withTimeout(12000);
+    try {
+      const res = await fetch('https://openrouter.ai/api/v1/models', { signal });
+      if (!res.ok) throw new Error('openrouter error ' + res.status);
+      const json = await res.json();
+      const models = json.data || [];
+      return models
+        .filter((m) => typeof m.created === 'number')
+        .sort((a, b) => (b.created || 0) - (a.created || 0))
+        .slice(0, limit)
+        .map((m) => ({
+          title: m.name || m.id,
+          url: `https://openrouter.ai/${m.id}`,
+          publishedAt: m.created
+            ? new Date(m.created * 1000).toISOString()
+            : undefined,
+        }));
+    } finally {
+      clear();
+    }
+  };
+
+  const fetchFeed = async (source) => {
+    if (!source.feed) return [];
+    try {
+      if (source.feed.kind === 'openrouter') return await fetchOpenRouter();
+      const xml = await fetchViaProxy(source.feed.url);
+      return parseRss(xml);
+    } catch {
+      return [];
+    }
+  };
+
+  // ===== 渲染页面 =====
+  const render = () => {
+    const sectionsEl = document.getElementById('sections');
+    sectionsEl.innerHTML = '';
+
+    CATEGORIES.forEach((cat) => {
+      const sec = document.createElement('section');
+      sec.className = 'section';
+
+      const doneInCat = SOURCES.filter(s => s.category === cat.id && done.includes(s.id)).length;
+      const totalInCat = SOURCES.filter(s => s.category === cat.id).length;
+      const allDone = doneInCat === totalInCat;
+
+      const head = document.createElement('div');
+      head.className = 'section-head';
+      head.innerHTML = `
+        <span class="section-num">${cat.num}、</span>
+        <span class="section-title">${cat.label}</span>
+        <span class="section-rule"></span>
+        <span class="section-meta" data-cat="${cat.id}">
+          ${allDone ? `<span class="done-mark">✓ 全部完成</span>` : `待打卡 <span class="cat-count">${doneInCat}/${totalInCat}</span>`}
+        </span>
+      `;
+      sec.appendChild(head);
+
+      const rows = document.createElement('div');
+      rows.className = 'rows';
+
+      SOURCES.filter(s => s.category === cat.id).forEach(s => {
+        const isDone = done.includes(s.id);
+        const row = document.createElement('div');
+        row.className = `row ${isDone ? 'done' : ''}`;
+        row.dataset.id = s.id;
+
+        // 拼接 Preview HTML
+        let previewHTML = '';
+        const hasFeed = !!s.feed;
+        const items = feeds[s.id];
+        const loading = !feedsLoaded && hasFeed;
+        const showPreview = hasFeed && items && items.length > 0;
+        const showGoArrow = !showPreview && !(hasFeed && loading);
+
+        if (loading) {
+          previewHTML = `
+            <ul class="row-preview" style="opacity: 0.75">
+              <li style="display: flex; align-items: center;">
+                <svg class="pencil-loader" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: var(--crayon-blue); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-right: 8px; animation: pencilWiggle 1s ease-in-out infinite; transform-origin: bottom left;">
+                  <path d="M18 2 L22 6 L9 19 L5 19 L5 15 Z" />
+                  <path d="M16 4 L20 8" />
+                </svg>
+                <span class="t" style="font-style: italic; font-size: 12.5px;">正在用铅笔记录最新动态...</span>
+              </li>
+            </ul>`;
+        } else if (showPreview) {
+          previewHTML = `
+            <ul class="row-preview">
+              ${items.slice(0, 3).map(it => `
+                <li>
+                  <a href="${it.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                    <span class="t">${it.title}</span>
+                    ${it.publishedAt ? `<span class="d">${relativeTime(it.publishedAt)}</span>` : ''}
+                  </a>
+                </li>
+              `).join('')}
+            </ul>`;
+        } else if (hasFeed && (!items || items.length === 0) && s.defaultPreview) {
+          previewHTML = `
+            <ul class="row-preview" style="opacity: 0.8">
+              ${s.defaultPreview.map(([title, time]) => `
+                <li>
+                  <a href="${s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                    <span class="t">${title}</span>
+                    <span class="d">${time}</span>
+                  </a>
+                </li>
+              `).join('')}
+            </ul>`;
+        } else if (!hasFeed && s.defaultPreview) {
+          previewHTML = `
+            <ul class="row-preview" style="opacity: 0.8">
+              ${s.defaultPreview.map(([title, time]) => `
+                <li>
+                  <a href="${s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                    <span class="t">${title}</span>
+                    <span class="d">${time}</span>
+                  </a>
+                </li>
+              `).join('')}
+            </ul>`;
+        }
+
+        const goArrowHTML = showGoArrow ? `
+          <a href="${s.url}" target="_blank" rel="noreferrer noopener" class="go-arrow" onclick="event.stopPropagation()">
+            前往 ↗
+          </a>` : '';
+
+        row.innerHTML = `
+          <span class="check" role="checkbox" tabindex="0" aria-checked="${isDone ? 'true' : 'false'}" aria-label="${s.name}打卡状态" style="filter: url(#handdrawn-filter)">
+            <svg viewBox="0 0 24 24">
+              <!-- 手绘歪扭的方框 -->
+              <path class="box" d="M3 4.5 C 8 3.8, 16 3.2, 21 3.5 C 20.8 8.5, 21.2 15.5, 20.5 20.5 C 15.5 20.2, 7.5 20.8, 3.5 19.8 C 4.2 14.8, 3.5 8.2, 3 4.5 Z"/>
+              <!-- 手绘歪扭的对勾 -->
+              <path class="tick" d="M6 12 L10 15.5 L18 7.5"/>
+            </svg>
+          </span>
+          <div class="row-body">
+            <a class="row-name" href="${s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+              ${s.name}
+              <svg class="ext" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="row-desc">${s.desc}</div>
+            ${previewHTML}
+          </div>
+          ${goArrowHTML}
+        `;
+
+        // 鼠标点击整行都可以打卡，但在键盘导航时只有 .check 框和外链能获取焦点
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('a')) return;
+          toggle(s.id);
+        });
+
+        // 仅对 .check 绑定键盘操作并防止气泡双击
+        const checkEl = row.querySelector('.check');
+        checkEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggle(s.id);
+        });
+        checkEl.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            toggle(s.id);
+          }
+        });
+
+        rows.appendChild(row);
+      });
+
+      sec.appendChild(rows);
+      sectionsEl.appendChild(sec);
+    });
+
+    updateProgressUI();
+  };
+
+  let lastAllDone = false;
+
+  const triggerConfetti = () => {
+    const sheet = document.getElementById('sheet');
+    const colors = ['var(--crayon-pink)', 'var(--crayon-blue)', 'var(--crayon-yellow)', 'var(--done-green)'];
+    
+    for (let i = 0; i < 20; i++) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      el.setAttribute('class', 'confetti-doodle');
+      el.setAttribute('viewBox', '0 0 24 24');
+      
+      const size = 12 + Math.random() * 16;
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+      el.style.left = `${10 + Math.random() * 80}%`;
+      el.style.top = `${5 + Math.random() * 15}%`;
+      
+      const delay = Math.random() * 0.4;
+      const duration = 1.2 + Math.random() * 1.2;
+      el.style.animationDelay = `${delay}s`;
+      el.style.animationDuration = `${duration}s`;
+      
+      const isStar = Math.random() > 0.5;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      if (isStar) {
+        path.setAttribute('d', 'M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z');
+      } else {
+        path.setAttribute('d', 'M12 4.419C12.441 3.326 13.567 2 15.632 2 19.102 2 22 4.887 22 8.441c0 4.673-5.241 8.878-10 13.559-4.759-4.681-10-8.886-10-13.559C2 4.887 4.898 2 8.368 2c2.065 0 3.191 1.326 3.632 2.419z');
+      }
+      path.setAttribute('fill', colors[Math.floor(Math.random() * colors.length)]);
+      el.appendChild(path);
+      sheet.appendChild(el);
+      
+      setTimeout(() => {
+        el.remove();
+      }, (delay + duration) * 1000);
+    }
+  };
+
+  const updateProgressUI = () => {
+    const cur = done.length;
+    const ratio = TOTAL ? cur / TOTAL : 0;
+    const circ = 2 * Math.PI * 44;
+    document.getElementById('progressRing').setAttribute('stroke-dashoffset', circ * (1 - ratio));
+    document.getElementById('progressNum').textContent = `${cur}/${TOTAL}`;
+    document.getElementById('streakVal').textContent = `${computeStreak()} 天`;
+    
+    const isAllDoneNow = cur === TOTAL;
+    document.getElementById('sheet').classList.toggle('all-done', isAllDoneNow);
+    
+    if (isAllDoneNow && !lastAllDone) {
+      triggerConfetti();
+    }
+    lastAllDone = isAllDoneNow;
+    
+    // 微弱倾斜进度图章以增加趣味
+    const stampEl = document.querySelector('.progress-stamp');
+    if (stampEl) {
+      const rot = -8 + (ratio * 15);
+      stampEl.style.transform = `rotate(${rot}deg) scale(${1 + ratio * 0.1})`;
+    }
+  };
+
+  const toggle = (id) => {
+    const idx = done.indexOf(id);
+    if (idx > -1) {
+      done.splice(idx, 1);
+    } else {
+      done.push(id);
+    }
+    saveDone(done);
+    render();
+  };
+
+  // ===== 加载与刷新最新 Feeds =====
+  const loadFeeds = async (force = false) => {
+    if (refreshing) return;
+    refreshing = true;
+    updateCacheInfoUI('正在加载最新信息...');
+
+    const cache = getFeedsCache();
+    const now = Date.now();
+
+    if (!force && cache && now - cache.updatedAt < 30 * 60 * 1000) {
+      feeds = cache.feeds;
+      feedsLoaded = true;
+      refreshing = false;
+      const timeStr = new Date(cache.updatedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      updateCacheInfoUI(`（已缓存，上次更新：${timeStr}）`);
+      render();
+      return;
+    }
+
+    const feedSources = SOURCES.filter(s => s.feed);
+    try {
+      const results = await Promise.all(
+        feedSources.map(async (s) => {
+          const items = await fetchFeed(s);
+          return [s.id, items];
+        })
+      );
+      const nextFeeds = Object.fromEntries(results);
+
+      // 如果抓取空但缓存有，则保留缓存
+      if (cache) {
+        for (const [id, items] of Object.entries(nextFeeds)) {
+          if (items.length === 0 && cache.feeds[id] && cache.feeds[id].length > 0) {
+            nextFeeds[id] = cache.feeds[id];
+          }
+        }
+      }
+
+      feeds = nextFeeds;
+      saveFeedsCache(nextFeeds, now);
+      feedsLoaded = true;
+      const timeStr = new Date(now).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      updateCacheInfoUI(`（已缓存，上次更新：${timeStr}）`);
+    } catch (e) {
+      console.error(e);
+      if (cache) {
+        feeds = cache.feeds;
+        const timeStr = new Date(cache.updatedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        updateCacheInfoUI(`（已缓存，上次更新：${timeStr}）`);
+      } else {
+        updateCacheInfoUI('（加载失败，已使用默认预览）');
+      }
+      feedsLoaded = true;
+    } finally {
+      refreshing = false;
+      render();
+    }
+  };
+
+  const updateCacheInfoUI = (text) => {
+    const el = document.getElementById('feedCacheInfo');
+    if (!el) return;
+    el.innerHTML = `
+      <span>${text}</span>
+      <button class="btn-refresh" id="btnRefresh" title="重新获取最新数据并刷新缓存">
+        ${refreshing ? '正在刷新...' : '↻ 强制刷新'}
+      </button>
+    `;
+    const btn = document.getElementById('btnRefresh');
+    if (btn) {
+      btn.disabled = refreshing;
+      btn.addEventListener('click', () => loadFeeds(true));
+    }
+  };
+
+  // ===== 初始化 =====
+  done = getDone();
+  render();
+  loadFeeds(false);
+
+  // 首次点击提示
+  const hint = document.getElementById('hint');
+  setTimeout(() => hint.classList.add('show'), 600);
+  setTimeout(() => hint.classList.remove('show'), 3200);
+</script>
+</body>
+</html>
