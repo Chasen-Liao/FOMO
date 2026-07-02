@@ -32,7 +32,15 @@ const fetchViaProxy = async (url: string, timeoutMs = 10000): Promise<string> =>
   throw lastErr ?? new Error('所有代理均失败')
 }
 
-const parseRss = (xml: string, limit = 3): FeedItem[] => {
+const toAbsoluteUrl = (url: string, baseUrl?: string): string => {
+  try {
+    return new URL(url, baseUrl).href
+  } catch {
+    return url
+  }
+}
+
+const parseRss = (xml: string, limit = 3, baseUrl?: string): FeedItem[] => {
   const doc = new DOMParser().parseFromString(xml, 'text/xml')
   const nodes = Array.from(doc.querySelectorAll('item, entry')).slice(0, limit)
   return nodes
@@ -44,9 +52,30 @@ const parseRss = (xml: string, limit = 3): FeedItem[] => {
         ''
       const date =
         it.querySelector('pubDate, published, updated')?.textContent?.trim() || undefined
-      return { title, url: link, publishedAt: date }
+      return { title, url: toAbsoluteUrl(link, baseUrl), publishedAt: date }
     })
     .filter((x) => x.title && x.url)
+}
+
+const parseHtmlLinks = (
+  html: string,
+  baseUrl: string,
+  linkSelector: string,
+  limit = 3
+): FeedItem[] => {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const seen = new Set<string>()
+  return Array.from(doc.querySelectorAll<HTMLAnchorElement>(linkSelector))
+    .map((a) => ({
+      title: a.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      url: toAbsoluteUrl(a.getAttribute('href') ?? '', baseUrl),
+    }))
+    .filter((item) => {
+      if (!item.title || !item.url || seen.has(item.url)) return false
+      seen.add(item.url)
+      return true
+    })
+    .slice(0, limit)
 }
 
 const fetchOpenRouter = async (limit = 3): Promise<FeedItem[]> => {
@@ -66,7 +95,7 @@ const fetchOpenRouter = async (limit = 3): Promise<FeedItem[]> => {
       .slice(0, limit)
       .map((m) => ({
         title: m.name || m.id,
-        url: `https://openrouter.ai/${m.id}`,
+        url: `https://openrouter.ai/models/${m.id}`,
         publishedAt: m.created
           ? new Date(m.created * 1000).toISOString()
           : undefined,
@@ -81,8 +110,11 @@ export const fetchFeed = async (source: Source): Promise<FeedItem[]> => {
   if (!source.feed) return []
   try {
     if (source.feed.kind === 'openrouter') return await fetchOpenRouter()
-    const xml = await fetchViaProxy(source.feed.url)
-    return parseRss(xml)
+    const text = await fetchViaProxy(source.feed.url)
+    if (source.feed.kind === 'html') {
+      return parseHtmlLinks(text, source.feed.baseUrl, source.feed.linkSelector)
+    }
+    return parseRss(text, 3, source.feed.url)
   } catch {
     return []
   }

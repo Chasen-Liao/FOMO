@@ -11,7 +11,13 @@ type Props = {
 
 export default function SourceCard({ source, items, loading, done, onToggle }: Props) {
   const hasFeed = !!source.feed
-  const showPreview = hasFeed && items !== undefined && items.length > 0
+  const previewItems =
+    hasFeed && items !== undefined && items.length > 0
+      ? items
+      : !loading
+        ? source.fallbackPreview
+        : undefined
+  const showPreview = !!previewItems && previewItems.length > 0
   const showGoArrow = !showPreview && !(hasFeed && loading)
 
   return (
@@ -60,7 +66,7 @@ export default function SourceCard({ source, items, loading, done, onToggle }: P
 
         {showPreview && (
           <ul className="row-preview">
-            {items!.slice(0, 3).map((it, i) => (
+            {previewItems!.slice(0, 3).map((it, i) => (
               <li key={i}>
                 <a 
                   href={it.url} 

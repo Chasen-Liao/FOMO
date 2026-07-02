@@ -23,7 +23,22 @@ export const SOURCES: Source[] = [
     category: 'blog',
     url: 'https://www.anthropic.com/research',
     desc: 'A 社官方研究，前沿趋势的集中来源',
-    feed: { kind: 'rss', url: 'https://www.anthropic.com/news/rss.xml' },
+    feed: {
+      kind: 'html',
+      url: 'https://www.anthropic.com/news',
+      baseUrl: 'https://www.anthropic.com',
+      linkSelector: 'a[href^="/news/"], a[href^="/research/"]',
+    },
+    fallbackPreview: [
+      {
+        title: 'Redeploying Fable 5',
+        url: 'https://www.anthropic.com/news/redeploying-fable-5',
+      },
+      {
+        title: 'Introducing Claude Sonnet 5',
+        url: 'https://www.anthropic.com/news/claude-sonnet-5',
+      },
+    ],
   },
   {
     id: 'openai',
@@ -32,6 +47,20 @@ export const SOURCES: Source[] = [
     url: 'https://openai.com/research/',
     desc: 'O 社官方研究，可能定义下个阶段的趋势',
     feed: { kind: 'rss', url: 'https://openai.com/blog/rss.xml' },
+    fallbackPreview: [
+      {
+        title: 'How ChatGPT adoption has expanded',
+        url: 'https://openai.com/index/how-chatgpt-adoption-has-expanded',
+      },
+      {
+        title: 'Inside Genebench-Pro',
+        url: 'https://openai.com/index/genebench-pro/case-studies',
+      },
+      {
+        title: 'Introducing GeneBench-Pro',
+        url: 'https://openai.com/index/introducing-genebench-pro',
+      },
+    ],
   },
   // 模型
   {

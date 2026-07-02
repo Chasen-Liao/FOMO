@@ -925,10 +925,15 @@
       category: 'blog',
       url: 'https://www.anthropic.com/research',
       desc: 'A 社官方研究，前沿趋势的集中来源',
-      feed: { kind: 'rss', url: 'https://www.anthropic.com/news/rss.xml' },
+      feed: {
+        kind: 'html',
+        url: 'https://www.anthropic.com/news',
+        baseUrl: 'https://www.anthropic.com',
+        linkSelector: 'a[href^="/news/"], a[href^="/research/"]'
+      },
       defaultPreview: [
-        ['Interspace: Multi-agent communication standard', '1 天前'],
-        ['Evaluating context length limitations of Claude 3.5', '2 天前']
+        ['Redeploying Fable 5', '1 天前', 'https://www.anthropic.com/news/redeploying-fable-5'],
+        ['Introducing Claude Sonnet 5', '1 天前', 'https://www.anthropic.com/news/claude-sonnet-5']
       ]
     },
     {
@@ -939,8 +944,9 @@
       desc: 'O 社官方研究，可能定义下个阶段的趋势',
       feed: { kind: 'rss', url: 'https://openai.com/blog/rss.xml' },
       defaultPreview: [
-        ['GPT-5 programming benchmark report', '1 天前'],
-        ['New alignment methods for Reasoning models', '3 天前']
+        ['How ChatGPT adoption has expanded', '1 天前', 'https://openai.com/index/how-chatgpt-adoption-has-expanded'],
+        ['Inside Genebench-Pro', '1 天前', 'https://openai.com/index/genebench-pro/case-studies'],
+        ['Introducing GeneBench-Pro', '1 天前', 'https://openai.com/index/introducing-genebench-pro']
       ]
     },
     {
@@ -1123,7 +1129,15 @@
     throw lastErr || new Error('所有 RSS 代理均失败');
   };
 
-  const parseRss = (xml, limit = 3) => {
+  const toAbsoluteUrl = (url, baseUrl) => {
+    try {
+      return new URL(url, baseUrl).href;
+    } catch {
+      return url;
+    }
+  };
+
+  const parseRss = (xml, limit = 3, baseUrl) => {
     const doc = new DOMParser().parseFromString(xml, 'text/xml');
     const nodes = Array.from(doc.querySelectorAll('item, entry')).slice(0, limit);
     return nodes
@@ -1135,9 +1149,25 @@
           '';
         const date =
           it.querySelector('pubDate, published, updated')?.textContent?.trim() || undefined;
-        return { title, url: link, publishedAt: date };
+        return { title, url: toAbsoluteUrl(link, baseUrl), publishedAt: date };
       })
       .filter((x) => x.title && x.url);
+  };
+
+  const parseHtmlLinks = (html, baseUrl, linkSelector, limit = 3) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const seen = new Set();
+    return Array.from(doc.querySelectorAll(linkSelector))
+      .map((a) => ({
+        title: a.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        url: toAbsoluteUrl(a.getAttribute('href') ?? '', baseUrl)
+      }))
+      .filter((item) => {
+        if (!item.title || !item.url || seen.has(item.url)) return false;
+        seen.add(item.url);
+        return true;
+      })
+      .slice(0, limit);
   };
 
   const fetchOpenRouter = async (limit = 3) => {
@@ -1153,7 +1183,7 @@
         .slice(0, limit)
         .map((m) => ({
           title: m.name || m.id,
-          url: `https://openrouter.ai/${m.id}`,
+          url: `https://openrouter.ai/models/${m.id}`,
           publishedAt: m.created
             ? new Date(m.created * 1000).toISOString()
             : undefined,
@@ -1167,8 +1197,11 @@
     if (!source.feed) return [];
     try {
       if (source.feed.kind === 'openrouter') return await fetchOpenRouter();
-      const xml = await fetchViaProxy(source.feed.url);
-      return parseRss(xml);
+      const text = await fetchViaProxy(source.feed.url);
+      if (source.feed.kind === 'html') {
+        return parseHtmlLinks(text, source.feed.baseUrl, source.feed.linkSelector);
+      }
+      return parseRss(text, 3, source.feed.url);
     } catch {
       return [];
     }
@@ -1242,9 +1275,9 @@
         } else if (hasFeed && (!items || items.length === 0) && s.defaultPreview) {
           previewHTML = `
             <ul class="row-preview" style="opacity: 0.8">
-              ${s.defaultPreview.map(([title, time]) => `
+              ${s.defaultPreview.map(([title, time, url]) => `
                 <li>
-                  <a href="${s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                  <a href="${url || s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
                     <span class="t">${title}</span>
                     <span class="d">${time}</span>
                   </a>
@@ -1254,9 +1287,9 @@
         } else if (!hasFeed && s.defaultPreview) {
           previewHTML = `
             <ul class="row-preview" style="opacity: 0.8">
-              ${s.defaultPreview.map(([title, time]) => `
+              ${s.defaultPreview.map(([title, time, url]) => `
                 <li>
-                  <a href="${s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
+                  <a href="${url || s.url}" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation()">
                     <span class="t">${title}</span>
                     <span class="d">${time}</span>
                   </a>
