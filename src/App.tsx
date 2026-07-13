@@ -112,6 +112,8 @@ export default function App() {
       </div>
 
       <article className={`sheet ${allDone ? 'all-done' : ''}`} id="sheet">
+        <div className="paper-grain" aria-hidden="true"></div>
+        <div className="paper-edge-vignette" aria-hidden="true"></div>
         <div 
           className="paper-fold" 
           onClick={() => setDarkMode(!darkMode)}
