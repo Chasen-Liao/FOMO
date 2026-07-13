@@ -384,7 +384,6 @@ body{
   padding-left:10px;
   border-left:2px solid var(--rule);
   min-height: 68px; /* Fixed height for 3 lines to contain skeleton/content stably */
-  transition: min-height 0.3s ease;
 }
 .skeleton-container {
   position: relative;
