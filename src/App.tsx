@@ -190,6 +190,15 @@ export default function App() {
       >
         chasen
       </a>
+
+      <svg style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }} aria-hidden="true">
+        <defs>
+          <filter id="ink-bleed-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
     </>
   )
 }

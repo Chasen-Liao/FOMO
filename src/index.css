@@ -294,11 +294,17 @@ body{
   min-height:40px;
   border-bottom:1px dashed transparent;
   cursor:pointer;
-  transition:background 0.2s;
   position:relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s;
 }
 .row:hover{
   background:rgba(180,140,80,0.07);
+}
+.row:active {
+  transform: scale(0.992) translateZ(-4px) rotateX(0.8deg);
+  background: rgba(180, 140, 80, 0.12);
 }
 .row + .row{
   border-top:1px dashed var(--rule-soft);
@@ -329,8 +335,20 @@ body{
   stroke-dashoffset:60;
   transition:stroke-dashoffset 0.35s ease;
 }
-.row.done .check .tick{
-  stroke-dashoffset:0;
+.row.done .check .tick {
+  filter: url(#ink-bleed-filter);
+  animation: bleedExpansion 0.4s ease-out forwards;
+}
+
+@keyframes bleedExpansion {
+  0% {
+    stroke-dashoffset: 60;
+    filter: url(#ink-bleed-filter) contrast(1.5) brightness(0.9);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    filter: url(#ink-bleed-filter) contrast(1.1) brightness(1);
+  }
 }
 /* 已完成时方框颜色变绿 */
 .row.done .check .box{
@@ -371,6 +389,7 @@ body{
   text-decoration:line-through;
   text-decoration-color:var(--done-green);
   text-decoration-thickness:1.5px;
+  filter: url(#ink-bleed-filter);
 }
 .row-desc{
   font-size:12.5px;

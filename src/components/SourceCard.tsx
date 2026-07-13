@@ -28,6 +28,7 @@ export default function SourceCard({ source, items, loading, done, onToggle }: P
       aria-checked={done ? 'true' : 'false'}
       aria-label={`${source.name} 打卡项`}
       onClick={onToggle}
+      onTouchStart={() => {}}
       onKeyDown={(e) => {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault()
