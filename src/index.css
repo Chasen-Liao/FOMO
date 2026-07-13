@@ -17,6 +17,23 @@
   --sepia:        #a67c3f;        /* 泛黄高光 */
   --desk:         #2a2018;        /* 桌面底色 */
 }
+
+:root.dark {
+  --paper:        #2c251e;        /* 深褐老牛皮纸 */
+  --paper-light:  #352d24;
+  --paper-shade:  #201b16;
+  --ink:          #e5dacf;        /* 亮米金淡墨 */
+  --ink-soft:     #cbbb9f;        /* 柔和金褐 */
+  --ink-muted:    #8e7e68;        /* 弱化墨 */
+  --rule:         #6b5a45;        /* 深金色横线 */
+  --rule-soft:    rgba(140, 110, 80, 0.22);
+  --margin-red:   #ab3d30;        /* 哑红装订线 */
+  --margin-red-s: #8a2b20;
+  --stamp-red:    #cd5c5c;        /* 朱砂红章 */
+  --done-green:   #6b8e5c;        /* 青苔绿 */
+  --sepia:        #c2a278;
+  --desk:         #15100c;        /* 暗桌面 */
+}
 *{ box-sizing:border-box; margin:0; padding:0; }
 html,body, #root{ min-height:100%; }
 html{ overflow-x:hidden; }
@@ -684,5 +701,45 @@ a:focus-visible{
     color: var(--paper);
     opacity: 0.4;
   }
+}
+
+/* ========== 折角暗色切换 ========== */
+.paper-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.3s ease;
+  background: linear-gradient(225deg, transparent 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.05) 55%, transparent 55%);
+}
+.paper-fold::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent transparent var(--paper-shade) transparent;
+  box-shadow: -2px 2px 4px rgba(0,0,0,0.15);
+  transition: border-color 0.3s, border-width 0.2s;
+}
+.paper-fold:hover::before {
+  border-width: 0 48px 48px 0;
+}
+.fold-text {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 14px;
+  color: var(--ink-muted);
+  transform: rotate(45deg);
+  pointer-events: none;
+  user-select: none;
 }
 

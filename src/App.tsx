@@ -9,7 +9,22 @@ import CategorySection from './components/CategorySection'
 
 export default function App() {
   const [done, setDone] = useState<string[]>(() => getDone())
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('fomo:dark-mode')
+    if (saved !== null) return saved === 'true'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
   const [feeds, setFeeds] = useState<Record<string, FeedItem[]>>({})
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (darkMode) {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+    localStorage.setItem('fomo:dark-mode', String(darkMode))
+  }, [darkMode])
   const [feedsLoaded, setFeedsLoaded] = useState(false)
   const [streak, setStreak] = useState(0)
   const [showHint, setShowHint] = useState(false)
@@ -97,6 +112,17 @@ export default function App() {
       </div>
 
       <article className={`sheet ${allDone ? 'all-done' : ''}`} id="sheet">
+        <div 
+          className="paper-fold" 
+          onClick={() => setDarkMode(!darkMode)}
+          title={darkMode ? "切换至白昼模式" : "切换至黑夜模式"}
+          aria-label="昼夜切换折角"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') setDarkMode(!darkMode); }}
+        >
+          <span className="fold-text">{darkMode ? "昼" : "夜"}</span>
+        </div>
         <span className="tape" aria-hidden="true"></span>
         <span className="margin-line" aria-hidden="true"></span>
         <span className="punch p1" aria-hidden="true"></span>
