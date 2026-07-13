@@ -59,8 +59,15 @@ export default function SourceCard({ source, items, loading, done, onToggle }: P
         <div className="row-desc">{source.desc}</div>
         
         {loading && hasFeed && (
-          <div className="row-preview" style={{ opacity: 0.6 }}>
-            <li><span className="t" style={{ fontStyle: 'italic', color: 'var(--ink-soft)' }}>加载中...</span></li>
+          <div className="row-preview skeleton-container">
+            <svg className="sketch-skeleton" viewBox="0 0 400 68" preserveAspectRatio="none">
+              {/* Row 1: Line 1 */}
+              <path d="M 5,12 Q 100,10 200,13 T 390,11" className="skeleton-pencil" />
+              {/* Row 2: Line 2 */}
+              <path d="M 5,34 Q 120,36 240,33 T 370,35" className="skeleton-pencil" />
+              {/* Row 3: Line 3 */}
+              <path d="M 5,56 Q 80,54 180,57 T 330,55" className="skeleton-pencil" />
+            </svg>
           </div>
         )}
 

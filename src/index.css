@@ -383,6 +383,38 @@ body{
   margin-top:6px;
   padding-left:10px;
   border-left:2px solid var(--rule);
+  min-height: 68px; /* Fixed height for 3 lines to contain skeleton/content stably */
+  transition: min-height 0.3s ease;
+}
+.skeleton-container {
+  position: relative;
+  overflow: hidden;
+}
+.sketch-skeleton {
+  width: 100%;
+  height: 68px;
+  display: block;
+}
+.skeleton-pencil {
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.35;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 0;
+  animation: pencilDraw 2s ease-in-out infinite alternate;
+}
+
+@keyframes pencilDraw {
+  0% {
+    stroke-dashoffset: 30;
+    opacity: 0.2;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.55;
+  }
 }
 .row-preview li{
   list-style:none;
