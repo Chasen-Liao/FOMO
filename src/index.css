@@ -166,7 +166,7 @@ body{
   overflow-wrap:anywhere;
 }
 .form-title .sub{
-  font-family:'Ma Shan Zheng', 'KaiTi', serif;
+  font-family:'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive, serif;
   font-size:15px;
   font-weight:500;
   color:var(--ink-muted);
@@ -185,7 +185,7 @@ body{
   margin-right:6px;
 }
 .form-meta .val{
-  font-family:'Ma Shan Zheng', serif;
+  font-family:'Ma Shan Zheng', 'ZCOOL KuaiLe', 'KaiTi', 'STKaiti', cursive, serif;
   font-size:18px;
   color:var(--ink);
   border-bottom:1px dotted var(--ink-muted);
@@ -209,13 +209,13 @@ body{
   overflow-wrap:anywhere;
 }
 
-/* 进度印章 —— 右上角圆形章 */
+/* 进度印章 —— 右上角圆形章，巧妙放置避开两侧文字与表头 */
 .progress-stamp{
   position:absolute;
-  top:48px; right:48px;
-  width:96px; height:96px;
+  top:28px; right:172px;
+  width:84px; height:84px;
   z-index:4;
-  transform:rotate(-8deg);
+  transform:rotate(-10deg);
 }
 .progress-stamp svg{ width:100%; height:100%; }
 .progress-stamp .ring{
@@ -231,7 +231,7 @@ body{
   opacity:0.25;
 }
 .progress-stamp text{
-  font-family:'ZCOOL KuaiLe', serif;
+  font-family:'ZCOOL KuaiLe', 'Ma Shan Zheng', 'KaiTi', cursive, serif;
   fill:var(--stamp-red);
 }
 .progress-stamp .num{
@@ -256,13 +256,13 @@ body{
   flex-wrap:wrap;
 }
 .section-num{
-  font-family:'Ma Shan Zheng', serif;
+  font-family:'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive, serif;
   font-size:34px;
   line-height:1;
   color:var(--stamp-red);
 }
 .section-title{
-  font-family:'Ma Shan Zheng', serif;
+  font-family:'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive, serif;
   font-size:26px;
   line-height:1;
   color:var(--ink);
@@ -794,7 +794,7 @@ a:focus-visible{
   position: absolute;
   top: 6px;
   right: 12px;
-  font-family: 'Ma Shan Zheng', serif;
+  font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive, serif;
   font-size: 14px;
   color: var(--ink);
   transform: rotate(45deg);
