@@ -61,7 +61,7 @@ export default function SourceCard({ source, items, loading, done, onToggle }: P
         
         {loading && hasFeed && (
           <div className="row-preview skeleton-container" role="status" aria-label="正在加载最新内容...">
-            <svg className="sketch-skeleton" viewBox="0 0 400 68" preserveAspectRatio="none">
+            <svg className="sketch-skeleton" viewBox="0 0 400 68" preserveAspectRatio="none" aria-hidden="true">
               {/* Row 1: Line 1 */}
               <path d="M 5,12 Q 100,10 200,13 T 390,11" className="skeleton-pencil" />
               {/* Row 2: Line 2 */}

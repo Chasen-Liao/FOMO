@@ -295,15 +295,13 @@ body{
   border-bottom:1px dashed transparent;
   cursor:pointer;
   position:relative;
-  perspective: 1000px;
-  transform-style: preserve-3d;
   transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s;
 }
 .row:hover{
   background:rgba(180,140,80,0.07);
 }
 .row:active {
-  transform: scale(0.992) translateZ(-4px) rotateX(0.8deg);
+  transform: perspective(1000px) scale(0.992) translateZ(-4px) rotateX(0.8deg);
   background: rgba(180, 140, 80, 0.12);
 }
 .row + .row{
