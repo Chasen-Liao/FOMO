@@ -16,6 +16,7 @@
   --done-green:   #4a6b3a;        /* 墨绿 */
   --sepia:        #a67c3f;        /* 泛黄高光 */
   --desk:         #2a2018;        /* 桌面底色 */
+  --paper-highlight: rgba(255,250,230,0.5);
 }
 
 :root.dark {
@@ -33,6 +34,7 @@
   --done-green:   #6b8e5c;        /* 青苔绿 */
   --sepia:        #c2a278;
   --desk:         #15100c;        /* 暗桌面 */
+  --paper-highlight: rgba(229, 218, 207, 0.15);
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 html,body, #root{ min-height:100%; }
@@ -63,7 +65,7 @@ body{
     0 40px 90px rgba(0,0,0,0.25);
   /* 纸张微微泛黄的不均匀感 */
   background-image:
-    radial-gradient(ellipse at 20% 10%, rgba(255,250,230,0.5), transparent 60%),
+    radial-gradient(ellipse at 20% 10%, var(--paper-highlight), transparent 60%),
     radial-gradient(ellipse at 85% 85%, rgba(180,150,100,0.12), transparent 55%),
     radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(160,130,80,0.08) 100%);
   animation:sheetDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -400,6 +402,8 @@ body{
   margin-top:6px;
   padding-left:10px;
   border-left:2px solid var(--rule);
+}
+.row-preview.skeleton-container {
   min-height: 68px; /* Fixed height for 3 lines to contain skeleton/content stably */
 }
 .skeleton-container {
@@ -761,6 +765,14 @@ a:focus-visible{
   cursor: pointer;
   z-index: 10;
   background: linear-gradient(225deg, transparent 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.05) 55%, transparent 55%);
+  transition: background 0.2s ease;
+}
+.paper-fold:hover {
+  background: linear-gradient(225deg, transparent 42%, rgba(0,0,0,0.15) 42%, rgba(0,0,0,0.05) 47%, transparent 47%);
+}
+.paper-fold:focus-visible {
+  outline: none;
+  filter: drop-shadow(-3px 3px 2px var(--stamp-red));
 }
 .paper-fold::before {
   content: "";

@@ -116,10 +116,15 @@ export default function App() {
           className="paper-fold" 
           onClick={() => setDarkMode(!darkMode)}
           title={darkMode ? "切换至白昼模式" : "切换至黑夜模式"}
-          aria-label="昼夜切换折角"
+          aria-label={darkMode ? "切换至白昼模式" : "切换至黑夜模式"}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') setDarkMode(!darkMode); }}
+          onKeyDown={(e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              setDarkMode(!darkMode);
+            }
+          }}
         >
           <span className="fold-text">{darkMode ? "昼" : "夜"}</span>
         </div>
